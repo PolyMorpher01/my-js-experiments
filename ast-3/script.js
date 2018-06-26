@@ -4,7 +4,6 @@ var previousButton = document.getElementById("left");
 var imageWrapper = document.getElementsByClassName("image-wrapper");
 var buttonWrapper = document.getElementById("button-number");
 
-
 var previousIndex = 0;
 var currentIndex = 0;
 
@@ -24,27 +23,36 @@ loadImages();
 
 nextButton.onclick = function () {
 
-    // previousIndex = currentIndex;
+    previousIndex = currentIndex;
 
     currentIndex = (currentIndex += 1) % images.length;
 
-    imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
+    if(previousIndex === 0 || previousIndex ===6){
+        return null;
+    }
+
+    transitionAnimation(currentIndex,previousIndex,"next");
+
+    // imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
 };
 
 
 previousButton.onclick = function () {
 
-    // previousIndex = currentIndex;
+    previousIndex = currentIndex;
     currentIndex = (currentIndex -= 1) % images.length;
-
-    console.log(currentIndex);
 
     if (currentIndex <= 0) {
         currentIndex = images.length - 1;
     }
 
+    if(previousIndex === 0 || previousIndex ===6){
+        return null;
+    }
 
-    imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
+    transitionAnimation(currentIndex,previousIndex,"previous");
+
+    // imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
 };
 
 
@@ -66,7 +74,7 @@ function loadImages() {
 
         newButton.onclick = function () {
             currentIndex = this.imagePosition;
-            imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
+            imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex) + "px";
         };
 
     }
@@ -74,9 +82,42 @@ function loadImages() {
 
 
 function currentLeftMargin(currentIndex) {
-    return (currentIndex * -600) + "px";
+    return (currentIndex * -600);
 }
 
-function transitionAnimation(previousIndex, currentIndex) {
+
+
+function transitionAnimation(currentIndex,previousIndex, side) {
+
+
+
+    var leftMargin  = currentLeftMargin(previousIndex);
+    var rightMargin = currentLeftMargin(currentIndex);
+    console.log("previous index", previousIndex);
+    console.log("current index", currentIndex);
+
+    console.log("left margin", leftMargin);
+    console.log("right margin", rightMargin);
+
+
+
+    var intervalRef = setInterval(function () {
+
+       //
+       // console.log("right margin", rightMargin);
+       // console.log("left margin", leftMargin);
+
+        if (side==="next")
+            leftMargin -= 30;
+        else
+            leftMargin +=30;
+
+       imageWrapper[0].style.marginLeft = leftMargin + "px";
+
+       if(leftMargin === rightMargin){
+           clearInterval(intervalRef);
+       }
+
+   },30);
 
 }
