@@ -1,0 +1,23 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#container{
+    height: 500px;
+    width: 500px;
+    background: lightskyblue;
+    position: relative;
+    padding: 10px;
+}
+
+.ball{
+    width: 30px;
+    height: 30px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
