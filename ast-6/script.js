@@ -10,13 +10,14 @@ $containerBox.appendChild($movingRedBall);
 $containerBox.appendChild($blueBall);
 
 var ballSize = 50;
-var containerTop = 0+10; //adding offset
-var containerBottom = 500-10;  //subtracting offset
+var containerBorder =10;
+var containerTop = 0+ containerBorder ; //adding offset
+var containerBottom = 500 - containerBorder;  //subtracting offset
 
-var containerLeft = 0+10;
-var containerRight = 500-10;
+var containerLeft = 0 + containerBorder ;
+var containerRight = 500 - containerBorder;
 
-var speed = 30;
+var speed = 20;
 
 var ballRed = {
     x: getRandom(),
@@ -41,14 +42,14 @@ updateBall(ballRed);
 var interval = setInterval(function () {
 
     checkBoundaryCollision(ballRed);
-    updateBall(ballRed);
+    checkBoundaryCollision(ballBlue);
 
     ballRed.x = ballRed.x + ballRed.dx * speed;
     ballRed.y = ballRed.y + ballRed.dy * speed;
 
     ballBlue.x = ballBlue.x + ballBlue.dx * speed;
     ballBlue.y = ballBlue.y + ballBlue.dy * speed;
-    checkBoundaryCollision(ballBlue);
+    updateBall(ballRed);
     updateBall(ballBlue);
 
     checkBoundingBoxCollision(ballBlue.x, ballRed.x, ballBlue.y, ballRed.y);
