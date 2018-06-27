@@ -5,3 +5,4 @@
 * [assignment -3 (Image Slider)](https://polymorpher01.github.io/my-js-experiments/ast-3/)
 * [assignment -5 (Bouncing Ball)](https://polymorpher01.github.io/my-js-experiments/ast-5/)
 * [assignment -6 (Two Bouncing Ball)](https://polymorpher01.github.io/my-js-experiments/ast-6/)
+* [assignment -7 (Ant Smasher-Imroved)](https://polymorpher01.github.io/my-js-experiments/ast-7/)
