@@ -1,11 +1,9 @@
 var $container = document.getElementById("container");
-var $ants = document.getElementsByClassName("ants");
 
-
-var numberOfAnts = 10;
+var numberOfBalls = 10;
 var speed = 20;
 
-var antSize = 50;
+var ballSize = 50;
 var containerBorder = 10;
 var containerTop = 0 + containerBorder; //adding offset
 var containerBottom = 500 - containerBorder;  //subtracting offset
@@ -14,26 +12,26 @@ var containerLeft = 0 + containerBorder;
 var containerRight = 500 - containerBorder;
 
 
-var antCoordinate = [];
+var antObject = [];
 
 
 
-for (let i = 0; i < numberOfAnts; i++) {
+for (let i = 0; i < numberOfBalls; i++) {
     var $ant = document.createElement("div");
 
-    var coordinates = {
+    var ant = {
         x: getRandom(),
         y: getRandom(),
         dx: 1,
         dy: 1,
         $ant: $ant
     };
-    antCoordinate.push(coordinates);
+    antObject.push(ant);
 
     $ant.className = "ants";
 
-    $ant.style.left = antCoordinate[i].x + "px";
-    $ant.style.top = antCoordinate[i].y + "px";
+    $ant.style.left = antObject[i].x + "px";
+    $ant.style.top = antObject[i].y + "px";
     $container.appendChild($ant);
 
     $ant.onclick = function () {
@@ -46,12 +44,12 @@ var interval = function () {
 
     setInterval(function () {
         for (var i = 0; i < $ants.length; i++) {
-            checkBoundaryCollision(antCoordinate[i]);
-            antCoordinate[i].x = antCoordinate[i].x + antCoordinate[i].dx * speed;
-            antCoordinate[i].y = antCoordinate[i].y + antCoordinate[i].dy * speed;
+            checkBoundaryCollision(antObject[i]);
+            antObject[i].x = antObject[i].x + antObject[i].dx * speed;
+            antObject[i].y = antObject[i].y + antObject[i].dy * speed;
 
-            // checkBoundingBoxCollision(antCoordinate[i].x, antCoordinate[i].y);
-            updateDirection(antCoordinate[i]);
+            // checkBoundingBoxCollision(antObject[i].x, antObject[i].y);
+            updateDirection(antObject[i]);
         }
     }, 700);
 
@@ -62,10 +60,10 @@ interval();
 
 function checkBoundaryCollision(ant) {
     var left = ant.x;
-    var right = ant.x + antSize;
+    var right = ant.x + ballSize;
 
     var top = ant.y;
-    var bottom = ant.y + antSize;
+    var bottom = ant.y + ballSize;
 
 
     if (top < containerTop) {
@@ -88,30 +86,30 @@ function checkBoundaryCollision(ant) {
 
 //bounding box collision
 function checkBoundingBoxCollision(x, y) {
-    if (x1 < x2 + antSize && x1 + antSize > x2 && y1 < y2 + antSize && antSize + y1 > y2) {
+    if (x1 < x2 + ballSize && x1 + ballSize > x2 && y1 < y2 + ballSize && ballSize + y1 > y2) {
 
-        if (x1 < x2 + antSize) {
+        if (x1 < x2 + ballSize) {
             ballBlue.dx = -1;
             ballRed.dx = 1;
-            ballBlue.x = ballRed.x + antSize;
+            ballBlue.x = ballRed.x + ballSize;
         }
 
-        if (x1 + antSize > x2) {
+        if (x1 + ballSize > x2) {
             ballBlue.dx = 1;
             ballRed.dx = -1;
-            ballRed.x = ballBlue.x - antSize;
+            ballRed.x = ballBlue.x - ballSize;
         }
 
-        if (y1 < y2 + antSize) {
+        if (y1 < y2 + ballSize) {
             ballBlue.dy = 1;
             ballRed.dy = -1;
-            ballBlue.y = ballRed.y + antSize;
+            ballBlue.y = ballRed.y + ballSize;
         }
 
-        if (antSize + y1 > y2) {
+        if (ballSize + y1 > y2) {
             ballBlue.dy = -1;
             ballRed.dy = 1;
-            ballRed.y = ballBlue.y - antSize;
+            ballRed.y = ballBlue.y - ballSize;
         }
 
     }
@@ -149,9 +147,9 @@ function checkBoundingBoxCollision(x, y) {
 
 
 
-function updateDirection(coordinate) {
-    coordinate.$ant.style.top = coordinate.y + "px";
-    coordinate.$ant.style.left = coordinate.x + "px";
+function updateDirection(ball) {
+    ball.$ant.style.top = ball.y + "px";
+    ball.$ant.style.left = ball.x + "px";
 }
 
 function getRandom() {

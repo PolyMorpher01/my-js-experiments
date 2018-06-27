@@ -1,9 +1,9 @@
 var $containerBox = document.getElementById("container");
 var $movingRedBall = document.createElement("div");
-$movingRedBall.className = "ball";
+$movingRedBall.className = "ant";
 
 var $blueBall = document.createElement("div");
-$blueBall.className = "ball";
+$blueBall.className = "ant";
 $blueBall.style.backgroundColor ="blue";
 
 $containerBox.appendChild($movingRedBall);
