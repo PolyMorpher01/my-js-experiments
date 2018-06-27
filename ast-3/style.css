@@ -33,4 +33,7 @@
 
 
 
-
+#button-number button{
+    background-color: lightskyblue;
+    color: black;
+}
