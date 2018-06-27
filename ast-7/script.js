@@ -1,19 +1,18 @@
 var $container = document.getElementById("container");
 
-var numberOfBalls = 4;
+var numberOfBalls = 8;
 var speed = 20;
 
 var ballSize = 50;
 var containerBorder = 10;
-var containerTop = 0 +containerBorder ; //adding offset
+var containerTop = 0 + containerBorder; //adding offset
 var containerBottom = 500;
 
-var containerLeft = 0 +containerBorder;
+var containerLeft = 0 + containerBorder;
 var containerRight = 500;
 
 
 var antCollection = [];
-
 
 
 for (let i = 0; i < numberOfBalls; i++) {
@@ -86,21 +85,20 @@ function checkBoundaryCollision(ant) {
 //bounding box collision
 function checkBoundingBoxCollision() {
 
-    antCollection.forEach(function (ant) {
+    antCollection.forEach(function (ant, index) {
         // console.log("Ant",ant);
-        antCollection.forEach(function(otherAnt) {
+        antCollection.forEach(function (otherAnt, index) {
 
             // console.log("ant1x", ant.x);
             // console.log("ant2x", otherAnt.x);
 
             // console.log("Other Ant",otherAnt);
-            if(ant===otherAnt){
-                //do Nothing
-                // console.log("hoho");
+            if (ant[index] === otherAnt[index]) {
+                return;
             }
 
 
-            else if ((ant.x < otherAnt.x + ballSize) && (ant.x + ballSize > otherAnt.x) && (ant.y < otherAnt.y + ballSize) && (ballSize + ant.y > otherAnt.y)) {
+            if ((ant.x < otherAnt.x + ballSize) && (ant.x + ballSize > otherAnt.x) && (ant.y < otherAnt.y + ballSize) && (ballSize + ant.y > otherAnt.y)) {
 
                 console.log("collision");
 
@@ -133,7 +131,6 @@ function checkBoundingBoxCollision() {
 
 
 }
-
 
 
 function updateDirection(antCollection) {
