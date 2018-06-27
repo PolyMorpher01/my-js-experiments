@@ -48,7 +48,7 @@ var interval = function () {
             antCollection[i].x = antCollection[i].x + antCollection[i].dx * speed;
             antCollection[i].y = antCollection[i].y + antCollection[i].dy * speed;
 
-            // checkBoundingBoxCollision(antCollection[i].x, antCollection[i].y);
+            checkBoundingBoxCollision();
             updateDirection(antCollection[i]);
         }
     }, 700);
@@ -85,64 +85,48 @@ function checkBoundaryCollision(ant) {
 }
 
 //bounding box collision
-function checkBoundingBoxCollision(x, y) {
-    if (x1 < x2 + ballSize && x1 + ballSize > x2 && y1 < y2 + ballSize && ballSize + y1 > y2) {
+function checkBoundingBoxCollision() {
 
-        if (x1 < x2 + ballSize) {
-            ballBlue.dx = -1;
-            ballRed.dx = 1;
-            ballBlue.x = ballRed.x + ballSize;
-        }
-
-        if (x1 + ballSize > x2) {
-            ballBlue.dx = 1;
-            ballRed.dx = -1;
-            ballRed.x = ballBlue.x - ballSize;
-        }
-
-        if (y1 < y2 + ballSize) {
-            ballBlue.dy = 1;
-            ballRed.dy = -1;
-            ballBlue.y = ballRed.y + ballSize;
-        }
-
-        if (ballSize + y1 > y2) {
-            ballBlue.dy = -1;
-            ballRed.dy = 1;
-            ballRed.y = ballBlue.y - ballSize;
-        }
-
-    }
-
-    allAnts.forEach(function(other) {
-
-        if (ant.x < other.x + 55 && ant.x + 55 > other.x && ant.y < other.y + 30 && 30 + ant.y > other.y) {
-            console.log("collided");
-
-            // if()
-
-            if (ant.x < other.x+55 || ant.x+55 > other.x) {
-                ant.dx = -ant.dx;
-                other.dx = -other.dx
-
+    antCollection.forEach(function (ant) {
+        console.log("Ant",ant);
+        antCollection.forEach(function(otherAnt) {
+            console.log("Other Ant",otherAnt);
+            if(ant===otherAnt){
+                //do Nothing
+                // console.log("hoho");
             }
 
-            if (ant.y < other.y+30 || ant.y+30 >other.y) {
-                ant.dy = -ant.dy;
-                other.dy = -other.dy
+            else if (ant.x < otherAnt.x + ballSize && ant.x + ballSize > otherAnt && ant.y < otherAnt.y + ballSize && ballSize + ant.y > otherAnt.y) {
 
+                console.log("collision");
+                // if (ant.x < otherAnt.x + ballSize) {
+                //     ballBlue.dx = -1;
+                //     ballRed.dx = 1;
+                //     ballBlue.x = ballRed.x + ballSize;
+                // }
+                //
+                // if (ant.x + ballSize > otherAnt.x) {
+                //     ballBlue.dx = 1;
+                //     ballRed.dx = -1;
+                //     ballRed.x = ballBlue.x - ballSize;
+                // }
+                //
+                // if (ant.y < otherAnt.y + ballSize) {
+                //     ballBlue.dy = 1;
+                //     ballRed.dy = -1;
+                //     ballBlue.y = ballRed.y + ballSize;
+                // }
+                //
+                // if (ballSize + ant.y > otherAnt.y) {
+                //     ballBlue.dy = -1;
+                //     ballRed.dy = 1;
+                //     ballRed.y = ballBlue.y - ballSize;
+                // }
             }
-
-            // if (ant.x+55 > other.x) {
-            //   other.dx = -other.dx
-            // }
-            // else if (ant.y+30 >other.y) {
-            //   other.dy = -other.dy
-            // }
-            // ant.updatePosition();
-
-        }
+        })
     });
+
+
 }
 
 
