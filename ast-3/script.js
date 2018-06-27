@@ -26,10 +26,10 @@ nextButton.onclick = function () {
     previousIndex = currentIndex;
 
     currentIndex = (currentIndex += 1) % images.length;
-
-    if(previousIndex === 0 || previousIndex ===6){
-        return null;
-    }
+    //
+    // if(previousIndex === 0 || previousIndex ===6){
+    //     return null;
+    // }
 
     transitionAnimation(currentIndex,previousIndex,"next");
 
@@ -42,13 +42,13 @@ previousButton.onclick = function () {
     previousIndex = currentIndex;
     currentIndex = (currentIndex -= 1) % images.length;
 
-    if (currentIndex <= 0) {
-        currentIndex = images.length - 1;
-    }
-
-    if(previousIndex === 0 || previousIndex ===6){
-        return null;
-    }
+    // if (currentIndex <= 0) {
+    //     currentIndex = images.length - 1;
+    // }
+    //
+    // if(previousIndex === 0 || previousIndex ===6){
+    //     return null;
+    // }
 
     transitionAnimation(currentIndex,previousIndex,"previous");
 
