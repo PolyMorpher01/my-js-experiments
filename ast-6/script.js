@@ -93,31 +93,27 @@ document.onkeydown = function (event) {
     if (event.keyCode === 38) {
         // UP
         if(!(ballBlue.y<containerTop)){
-            ballBlue.y -= 20;
-            updateBall(ballBlue);
+            ballBlue.dy = -1;
         }
 
     }
     else if (event.keyCode === 40) {
         //DOWN
         if(!(ballBlue.y>containerBottom-30)) {
-            ballBlue.y += 20;
-            updateBall(ballBlue);
+            ballBlue.dy = 1;
         }
     }
     else if (event.keyCode === 37) {
         //LEFT
         if(!(ballBlue.x<containerLeft)) {
-            ballBlue.x -= 20;
-            updateBall(ballBlue);
+            ballBlue.dx = -1;
         }
 
     }
     else if (event.keyCode === 39) {
         //RIGHT
         if(!(ballBlue.x>containerRight-30)) {
-            ballBlue.x += 20;
-            updateBall(ballBlue);
+            ballBlue.dx = 1;
         }
 
     }
