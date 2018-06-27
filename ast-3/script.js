@@ -1,159 +1,146 @@
-var $container = document.getElementById("container");
-var $ants = document.getElementsByClassName("ants");
+var nextButton = document.getElementById("right");
+var previousButton = document.getElementById("left");
+
+var imageWrapper = document.getElementsByClassName("image-wrapper");
+var buttonWrapper = document.getElementById("button-number");
+
+$numberButton = document.getElementsByClassName("numberButton");
 
 
-var numberOfAnts = 10;
-var speed = 20;
+var previousIndex = 0;
+var currentIndex = 0;
 
-var antSize = 50;
-var containerBorder = 10;
-var containerTop = 0 + containerBorder; //adding offset
-var containerBottom = 500 - containerBorder;  //subtracting offset
-
-var containerLeft = 0 + containerBorder;
-var containerRight = 500 - containerBorder;
-
-
-var antCoordinate = [];
-
+var images = [
+    "./images/img-1.jpg",
+    "./images/img-2.jpg",
+    "./images/img-3.jpg",
+    "./images/img-4.jpg",
+    "./images/img-5.jpg",
+    "./images/img-6.jpg",
+    "./images/img-7.jpg",
+];
 
 
-for (let i = 0; i < numberOfAnts; i++) {
-    var $ant = document.createElement("div");
+loadImages();
 
-    var coordinates = {
-        x: getRandom(),
-        y: getRandom(),
-        dx: 1,
-        dy: 1,
-        $ant: $ant
-    };
-    antCoordinate.push(coordinates);
+$numberButton[0].style.backgroundColor = "blue";
+$numberButton[0].style.color = "white";
 
-    $ant.className = "ants";
 
-    $ant.style.left = antCoordinate[i].x + "px";
-    $ant.style.top = antCoordinate[i].y + "px";
-    $container.appendChild($ant);
+nextButton.onclick = function () {
 
-    $ant.onclick = function () {
-        this.remove();
+    previousIndex = currentIndex;
+
+    currentIndex = (currentIndex += 1) % images.length;
+
+    if (currentIndex === 0) {
+        currentIndex = 6;
+        return null;
     }
-}
+
+    for( var k=0;k<$numberButton.length;k++){
+        $numberButton[k].style.backgroundColor = "lightskyblue";
+        $numberButton[k].style.color = "black";
+    }
 
 
-var interval = function () {
+    $numberButton[currentIndex].style.backgroundColor = "blue";
+    $numberButton[currentIndex].style.color = "white";
 
-    setInterval(function () {
-        for (var i = 0; i < $ants.length; i++) {
-            checkBoundaryCollision(antCoordinate[i]);
-            antCoordinate[i].x = antCoordinate[i].x + antCoordinate[i].dx * speed;
-            antCoordinate[i].y = antCoordinate[i].y + antCoordinate[i].dy * speed;
-
-            // checkBoundingBoxCollision(antCoordinate[i].x, antCoordinate[i].y);
-            updateDirection(antCoordinate[i]);
-        }
-    }, 700);
+    transitionAnimation(currentIndex,previousIndex,"next");
 
 };
 
-interval();
 
+previousButton.onclick = function () {
 
-function checkBoundaryCollision(ant) {
-    var left = ant.x;
-    var right = ant.x + antSize;
+    previousIndex = currentIndex;
+    currentIndex = (currentIndex -= 1) % images.length;
 
-    var top = ant.y;
-    var bottom = ant.y + antSize;
-
-
-    if (top < containerTop) {
-        ant.dy = 1;
-
-    }
-    if (left < containerLeft) {
-
-        ant.dx = 1;
-    }
-    if (right > containerRight) {
-
-        ant.dx = -1;
-    }
-    if (bottom > containerBottom) {
-        ant.dy = -1;
+    if (currentIndex < 0) {
+        currentIndex = 0;
+        return null;
     }
 
-}
-
-//bounding box collision
-function checkBoundingBoxCollision(x, y) {
-    if (x1 < x2 + antSize && x1 + antSize > x2 && y1 < y2 + antSize && antSize + y1 > y2) {
-
-        if (x1 < x2 + antSize) {
-            ballBlue.dx = -1;
-            ballRed.dx = 1;
-            ballBlue.x = ballRed.x + antSize;
-        }
-
-        if (x1 + antSize > x2) {
-            ballBlue.dx = 1;
-            ballRed.dx = -1;
-            ballRed.x = ballBlue.x - antSize;
-        }
-
-        if (y1 < y2 + antSize) {
-            ballBlue.dy = 1;
-            ballRed.dy = -1;
-            ballBlue.y = ballRed.y + antSize;
-        }
-
-        if (antSize + y1 > y2) {
-            ballBlue.dy = -1;
-            ballRed.dy = 1;
-            ballRed.y = ballBlue.y - antSize;
-        }
-
+    for( var l=0;l<$numberButton.length;l++){
+        $numberButton[l].style.backgroundColor = "lightskyblue";
+        $numberButton[l].style.color = "black";
     }
 
-    allAnts.forEach(function(other) {
+    $numberButton[currentIndex].style.backgroundColor = "blue";
+    $numberButton[currentIndex].style.color = "white";
 
-        if (ant.x < other.x + 55 && ant.x + 55 > other.x && ant.y < other.y + 30 && 30 + ant.y > other.y) {
-            console.log("collided");
+    transitionAnimation(currentIndex,previousIndex,"previous");
 
-            // if()
+};
 
-            if (ant.x < other.x+55 || ant.x+55 > other.x) {
-                ant.dx = -ant.dx;
-                other.dx = -other.dx
 
+function loadImages() {
+    for (var i = 0; i < images.length; i++) {
+
+        //add a new image
+        var newImage = document.createElement('img');
+        imageWrapper[0].appendChild(newImage);
+        newImage.src = images[i];
+
+        //add a new button
+        var newButton = document.createElement('button');
+        newButton.innerHTML = i + 1;
+        newButton.imagePosition = i;
+        newButton.className = "numberButton";
+        buttonWrapper.appendChild(newButton);
+
+
+        newButton.onclick = function () {
+            currentIndex = this.imagePosition;
+            imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex) + "px";
+
+            for( var j=0;j<$numberButton.length;j++){
+                $numberButton[j].style.backgroundColor = "lightskyblue";
+                $numberButton[j].style.color = "black";
             }
 
-            if (ant.y < other.y+30 || ant.y+30 >other.y) {
-                ant.dy = -ant.dy;
-                other.dy = -other.dy
+            this.style.backgroundColor = "blue";
+            this.style.color = "white";
+        };
 
-            }
+    }
+}
 
-            // if (ant.x+55 > other.x) {
-            //   other.dx = -other.dx
-            // }
-            // else if (ant.y+30 >other.y) {
-            //   other.dy = -other.dy
-            // }
-            // ant.updatePosition();
 
-        }
-    });
+function currentLeftMargin(currentIndex) {
+    return (currentIndex * -600);
 }
 
 
 
-function updateDirection(coordinate) {
-    coordinate.$ant.style.top = coordinate.y + "px";
-    coordinate.$ant.style.left = coordinate.x + "px";
-}
+function transitionAnimation(currentIndex,previousIndex, side) {
 
-function getRandom() {
-    return Math.floor(Math.random() * Math.floor(450));
+
+
+    var leftMargin  = currentLeftMargin(previousIndex);
+    var rightMargin = currentLeftMargin(currentIndex);
+    // console.log("previous index", previousIndex);
+    // console.log("current index", currentIndex);
+    //
+    // console.log("left margin", leftMargin);
+    // console.log("right margin", rightMargin);
+
+
+
+    var intervalRef = setInterval(function () {
+
+        if (side==="next")
+            leftMargin -= 30;
+        else
+            leftMargin +=30;
+
+       imageWrapper[0].style.marginLeft = leftMargin + "px";
+
+       if(leftMargin === rightMargin){
+           clearInterval(intervalRef);
+       }
+
+   },30);
+
 }
