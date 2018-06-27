@@ -1,15 +1,15 @@
 var $container = document.getElementById("container");
 
-var numberOfBalls = 10;
+var numberOfBalls = 4;
 var speed = 20;
 
 var ballSize = 50;
 var containerBorder = 10;
-var containerTop = 0 + containerBorder; //adding offset
-var containerBottom = 500 - containerBorder;  //subtracting offset
+var containerTop = 0 +containerBorder ; //adding offset
+var containerBottom = 500;
 
-var containerLeft = 0 + containerBorder;
-var containerRight = 500 - containerBorder;
+var containerLeft = 0 +containerBorder;
+var containerRight = 500;
 
 
 var antCollection = [];
@@ -43,15 +43,14 @@ for (let i = 0; i < numberOfBalls; i++) {
 var interval = function () {
 
     setInterval(function () {
+        checkBoundingBoxCollision();
         for (var i = 0; i < antCollection.length; i++) {
             checkBoundaryCollision(antCollection[i]);
             antCollection[i].x = antCollection[i].x + antCollection[i].dx * speed;
             antCollection[i].y = antCollection[i].y + antCollection[i].dy * speed;
-
-            checkBoundingBoxCollision();
             updateDirection(antCollection[i]);
         }
-    }, 700);
+    }, 200);
 
 };
 
@@ -88,40 +87,46 @@ function checkBoundaryCollision(ant) {
 function checkBoundingBoxCollision() {
 
     antCollection.forEach(function (ant) {
-        console.log("Ant",ant);
+        // console.log("Ant",ant);
         antCollection.forEach(function(otherAnt) {
-            console.log("Other Ant",otherAnt);
+
+            // console.log("ant1x", ant.x);
+            // console.log("ant2x", otherAnt.x);
+
+            // console.log("Other Ant",otherAnt);
             if(ant===otherAnt){
                 //do Nothing
                 // console.log("hoho");
             }
 
-            else if (ant.x < otherAnt.x + ballSize && ant.x + ballSize > otherAnt && ant.y < otherAnt.y + ballSize && ballSize + ant.y > otherAnt.y) {
+
+            else if ((ant.x < otherAnt.x + ballSize) && (ant.x + ballSize > otherAnt.x) && (ant.y < otherAnt.y + ballSize) && (ballSize + ant.y > otherAnt.y)) {
 
                 console.log("collision");
-                // if (ant.x < otherAnt.x + ballSize) {
-                //     ballBlue.dx = -1;
-                //     ballRed.dx = 1;
-                //     ballBlue.x = ballRed.x + ballSize;
-                // }
-                //
-                // if (ant.x + ballSize > otherAnt.x) {
-                //     ballBlue.dx = 1;
-                //     ballRed.dx = -1;
-                //     ballRed.x = ballBlue.x - ballSize;
-                // }
-                //
-                // if (ant.y < otherAnt.y + ballSize) {
-                //     ballBlue.dy = 1;
-                //     ballRed.dy = -1;
-                //     ballBlue.y = ballRed.y + ballSize;
-                // }
-                //
-                // if (ballSize + ant.y > otherAnt.y) {
-                //     ballBlue.dy = -1;
-                //     ballRed.dy = 1;
-                //     ballRed.y = ballBlue.y - ballSize;
-                // }
+
+                if (ant.x < otherAnt.x + ballSize) {
+                    ant.dx = -1;
+                    otherAnt.dx = 1;
+                    ant.x = otherAnt.x + ballSize;
+                }
+
+                if (ant.x + ballSize > otherAnt.x) {
+                    ant.dx = 1;
+                    otherAnt.dx = -1;
+                    otherAnt.x = ant.x - ballSize;
+                }
+
+                if (ant.y < otherAnt.y + ballSize) {
+                    ant.dy = 1;
+                    otherAnt.dy = -1;
+                    ant.y = otherAnt.y + ballSize;
+                }
+
+                if (ballSize + ant.y > otherAnt.y) {
+                    ant.dy = -1;
+                    otherAnt.dy = 1;
+                    otherAnt.y = ant.y - ballSize;
+                }
             }
         })
     });

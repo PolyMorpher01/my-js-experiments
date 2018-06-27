@@ -19,40 +19,40 @@ var containerRight = 500 - containerBorder;
 
 var speed = 20;
 
-var ballRed = {
+var otherAnt = {
     x: getRandom(),
     y:  getRandom(),
     dx: 1,
     dy: 1,
     $elem: $movingRedBall
 };
-// ballRed.$elem = $movingRedBall;
+// otherAnt.$elem = $movingRedBall;
 
 
-var ballBlue = {
+var ant = {
     x:  getRandom(),
     y:  getRandom(),
     dx: 1,
     dy: 1,
     $elem: $blueBall
 };
-updateBall(ballBlue);
-updateBall(ballRed);
+updateBall(ant);
+updateBall(otherAnt);
 
 var interval = setInterval(function () {
 
-    checkBoundaryCollision(ballRed);
-    checkBoundaryCollision(ballBlue);
+    checkBoundaryCollision(otherAnt);
+    checkBoundaryCollision(ant);
 
-    ballRed.x = ballRed.x + ballRed.dx * speed;
-    ballRed.y = ballRed.y + ballRed.dy * speed;
+    otherAnt.x = otherAnt.x + otherAnt.dx * speed;
+    otherAnt.y = otherAnt.y + otherAnt.dy * speed;
 
-    ballBlue.x = ballBlue.x + ballBlue.dx * speed;
-    ballBlue.y = ballBlue.y + ballBlue.dy * speed;
-    updateBall(ballRed);
-    updateBall(ballBlue);
+    ant.x = ant.x + ant.dx * speed;
+    ant.y = ant.y + ant.dy * speed;
+    updateBall(otherAnt);
+    updateBall(ant);
 
-    checkBoundingBoxCollision(ballBlue.x, ballRed.x, ballBlue.y, ballRed.y);
+    checkBoundingBoxCollision(ant.x, otherAnt.x, ant.y, otherAnt.y);
 
 }, 100);
 
@@ -95,28 +95,28 @@ function checkBoundaryCollision(ball) {
 document.onkeydown = function (event) {
     if (event.keyCode === 38) {
         // UP
-        if(!(ballBlue.y<containerTop)){
-            ballBlue.dy = -1;
+        if(!(ant.y<containerTop)){
+            ant.dy = -1;
         }
 
     }
     else if (event.keyCode === 40) {
         //DOWN
-        if(!(ballBlue.y>containerBottom-30)) {
-            ballBlue.dy = 1;
+        if(!(ant.y>containerBottom-30)) {
+            ant.dy = 1;
         }
     }
     else if (event.keyCode === 37) {
         //LEFT
-        if(!(ballBlue.x<containerLeft)) {
-            ballBlue.dx = -1;
+        if(!(ant.x<containerLeft)) {
+            ant.dx = -1;
         }
 
     }
     else if (event.keyCode === 39) {
         //RIGHT
-        if(!(ballBlue.x>containerRight-30)) {
-            ballBlue.dx = 1;
+        if(!(ant.x>containerRight-30)) {
+            ant.dx = 1;
         }
 
     }
@@ -128,27 +128,27 @@ function checkBoundingBoxCollision(x1, x2, y1, y2) {
     if (x1 < x2 + ballSize && x1 + ballSize > x2&& y1 < y2+ ballSize && ballSize + y1> y2) {
   
        if (x1 < x2 + ballSize){
-           ballBlue.dx = -1;
-           ballRed.dx = 1;
-           ballBlue.x = ballRed.x + ballSize;
+           ant.dx = -1;
+           otherAnt.dx = 1;
+           ant.x = otherAnt.x + ballSize;
        }
 
        if (x1 + ballSize > x2){
-           ballBlue.dx = 1;
-           ballRed.dx = -1;
-           ballRed.x = ballBlue.x - ballSize;
+           ant.dx = 1;
+           otherAnt.dx = -1;
+           otherAnt.x = ant.x - ballSize;
        }
 
        if (y1 < y2+ ballSize){
-           ballBlue.dy = 1;
-           ballRed.dy = -1;
-           ballBlue.y = ballRed.y + ballSize;
+           ant.dy = 1;
+           otherAnt.dy = -1;
+           ant.y = otherAnt.y + ballSize;
        }
 
        if(ballSize + y1> y2){
-           ballBlue.dy = -1;
-           ballRed.dy = 1;
-           ballRed.y = ballBlue.y - ballSize;
+           ant.dy = -1;
+           otherAnt.dy = 1;
+           otherAnt.y = ant.y - ballSize;
        }
 
     }

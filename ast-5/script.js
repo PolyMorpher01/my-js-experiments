@@ -16,8 +16,8 @@ var ball = {
 };
 ball.$elem = $movingBall;
 
-// $movingRedBall.style.top = ballRed.y + "px";
-// $movingRedBall.style.left = ballRed.x + "px";
+// $movingRedBall.style.top = otherAnt.y + "px";
+// $movingRedBall.style.left = otherAnt.x + "px";
 
 updateBall(ball);
 
