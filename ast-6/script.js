@@ -127,21 +127,25 @@ function checkBoundingBoxCollision(x1, x2, y1, y2) {
        if (x1 < x2 + ballSize){
            ballBlue.dx = -1;
            ballRed.dx = 1;
+           ballBlue.x = ballRed.x + ballSize;
        }
 
        if (x1 + ballSize > x2){
            ballBlue.dx = 1;
            ballRed.dx = -1;
+           ballRed.x = ballBlue.x - ballSize;
        }
 
        if (y1 < y2+ ballSize){
            ballBlue.dy = 1;
            ballRed.dy = -1;
+           ballBlue.y = ballRed.y + ballSize;
        }
 
        if(ballSize + y1> y2){
            ballBlue.dy = -1;
            ballRed.dy = 1;
+           ballRed.y = ballBlue.y - ballSize;
        }
 
     }
