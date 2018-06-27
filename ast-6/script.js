@@ -39,10 +39,12 @@ updateBall(ballBlue);
 updateBall(ballRed);
 
 var interval = setInterval(function () {
-    ballRed.x = ballRed.x + ballRed.dx * speed;
-    ballRed.y = ballRed.y + ballRed.dy * speed;
+
     checkBoundaryCollision(ballRed);
     updateBall(ballRed);
+
+    ballRed.x = ballRed.x + ballRed.dx * speed;
+    ballRed.y = ballRed.y + ballRed.dy * speed;
 
     ballBlue.x = ballBlue.x + ballBlue.dx * speed;
     ballBlue.y = ballBlue.y + ballBlue.dy * speed;
