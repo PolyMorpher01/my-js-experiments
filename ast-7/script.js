@@ -12,7 +12,7 @@ var containerLeft = 0 + containerBorder;
 var containerRight = 500 - containerBorder;
 
 
-var antObject = [];
+var antCollection = [];
 
 
 
@@ -26,12 +26,12 @@ for (let i = 0; i < numberOfBalls; i++) {
         dy: 1,
         $ant: $ant
     };
-    antObject.push(ant);
+    antCollection.push(ant);
 
     $ant.className = "ants";
 
-    $ant.style.left = antObject[i].x + "px";
-    $ant.style.top = antObject[i].y + "px";
+    $ant.style.left = antCollection[i].x + "px";
+    $ant.style.top = antCollection[i].y + "px";
     $container.appendChild($ant);
 
     $ant.onclick = function () {
@@ -43,13 +43,13 @@ for (let i = 0; i < numberOfBalls; i++) {
 var interval = function () {
 
     setInterval(function () {
-        for (var i = 0; i < $ants.length; i++) {
-            checkBoundaryCollision(antObject[i]);
-            antObject[i].x = antObject[i].x + antObject[i].dx * speed;
-            antObject[i].y = antObject[i].y + antObject[i].dy * speed;
+        for (var i = 0; i < antCollection.length; i++) {
+            checkBoundaryCollision(antCollection[i]);
+            antCollection[i].x = antCollection[i].x + antCollection[i].dx * speed;
+            antCollection[i].y = antCollection[i].y + antCollection[i].dy * speed;
 
-            // checkBoundingBoxCollision(antObject[i].x, antObject[i].y);
-            updateDirection(antObject[i]);
+            // checkBoundingBoxCollision(antCollection[i].x, antCollection[i].y);
+            updateDirection(antCollection[i]);
         }
     }, 700);
 
@@ -147,9 +147,9 @@ function checkBoundingBoxCollision(x, y) {
 
 
 
-function updateDirection(ball) {
-    ball.$ant.style.top = ball.y + "px";
-    ball.$ant.style.left = ball.x + "px";
+function updateDirection(antCollection) {
+    antCollection.$ant.style.top = antCollection.y + "px";
+    antCollection.$ant.style.left = antCollection.x + "px";
 }
 
 function getRandom() {
