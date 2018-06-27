@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#container{
+    height: 500px;
+    width: 500px;
+    background: lightskyblue;
+    position: relative;
+    /*padding: 5px;*/
+    margin: 0 auto;
+    margin-top: 50px;
+    border: 10px rebeccapurple solid;
+}
+
+
+.ants{
+    width: 30px;
+    height: 30px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+}
