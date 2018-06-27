@@ -26,14 +26,14 @@ nextButton.onclick = function () {
     previousIndex = currentIndex;
 
     currentIndex = (currentIndex += 1) % images.length;
-    //
-    // if(previousIndex === 0 || previousIndex ===6){
-    //     return null;
-    // }
+
+    if (currentIndex === 0) {
+        currentIndex = 6;
+        return null;
+    }
 
     transitionAnimation(currentIndex,previousIndex,"next");
 
-    // imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
 };
 
 
@@ -42,17 +42,13 @@ previousButton.onclick = function () {
     previousIndex = currentIndex;
     currentIndex = (currentIndex -= 1) % images.length;
 
-    // if (currentIndex <= 0) {
-    //     currentIndex = images.length - 1;
-    // }
-    //
-    // if(previousIndex === 0 || previousIndex ===6){
-    //     return null;
-    // }
+    if (currentIndex < 0) {
+        currentIndex = 0;
+        return null;
+    }
 
     transitionAnimation(currentIndex,previousIndex,"previous");
 
-    // imageWrapper[0].style.marginLeft = currentLeftMargin(currentIndex);
 };
 
 
@@ -62,7 +58,6 @@ function loadImages() {
         //add a new image
         var newImage = document.createElement('img');
         imageWrapper[0].appendChild(newImage);
-        // newImage.setAttribute("src",images[i]);
         newImage.src = images[i];
 
         //add a new button
@@ -93,19 +88,15 @@ function transitionAnimation(currentIndex,previousIndex, side) {
 
     var leftMargin  = currentLeftMargin(previousIndex);
     var rightMargin = currentLeftMargin(currentIndex);
-    console.log("previous index", previousIndex);
-    console.log("current index", currentIndex);
-
-    console.log("left margin", leftMargin);
-    console.log("right margin", rightMargin);
+    // console.log("previous index", previousIndex);
+    // console.log("current index", currentIndex);
+    //
+    // console.log("left margin", leftMargin);
+    // console.log("right margin", rightMargin);
 
 
 
     var intervalRef = setInterval(function () {
-
-       //
-       // console.log("right margin", rightMargin);
-       // console.log("left margin", leftMargin);
 
         if (side==="next")
             leftMargin -= 30;
