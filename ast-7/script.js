@@ -14,6 +14,10 @@ var containerRight = 1000;
 
 var antCollection = [];
 
+var $score  = document.getElementById("score");
+var score=0;
+$score.innerHTML = score;
+
 
 for (let i = 0; i < numberOfBalls; i++) {
     var $ant = document.createElement("div");
@@ -39,6 +43,10 @@ for (let i = 0; i < numberOfBalls; i++) {
         setTimeout(function () {
             that.remove();
         }, 1000);
+
+        score +=1;
+        $score.innerHTML = score;
+        console.log(score);
     }
 }
 

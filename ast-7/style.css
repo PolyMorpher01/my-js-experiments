@@ -3,6 +3,21 @@
     padding: 0;
 }
 
+.clear-fix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+#score-wrapper{
+    float: left;
+    width:200px;
+    margin-left: 10px;
+    margin-top: 20px;
+    font-size: 30px;
+}
+
+
 #container{
     height: 600px;
     width: 1000px;
@@ -12,6 +27,7 @@
     margin: 0 auto;
     margin-top: 20px;
     border: 10px rebeccapurple solid;
+    float: left;
 }
 
 
