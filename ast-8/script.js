@@ -24,7 +24,6 @@ var CONTAINER_RIGHT = 1000 - BOX_SIZE - CONTAINER_BORDER;
 var container1 = new Container($mainWrapper);
 container1.init();
 
-
 //start button
 $startButton.onclick = function () {
 
