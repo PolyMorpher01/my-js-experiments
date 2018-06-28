@@ -13,9 +13,7 @@ var CONTAINER_RIGHT = 1000 - BALL_SIZE;
 
 var antCollection = [];
 
-var $score = document.getElementById("score");
-var score = 0;
-$score.innerHTML = score;
+
 
 
 addAnts();
@@ -72,7 +70,6 @@ function startInterval() {
 
         checkBoundingBoxCollision();
         antCollection.forEach(function (ant) {
-            // var index = antCollection.indexOf(ant);
             checkBoundaryCollision(ant);
             ant.x = ant.x + ant.dx * SPEED;
             ant.y = ant.y + ant.dy * SPEED;
