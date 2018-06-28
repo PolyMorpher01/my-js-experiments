@@ -1,8 +1,10 @@
-var $container = document.getElementById("container");
 var $mainWrapper = document.getElementById("main-wrapper");
 
+var $buttonWrapper = document.getElementById("button-wrapper");
 var $startButton = document.getElementById("start");
 var $resetButton = document.getElementById("reset");
+
+var $scoreWrapper = document.getElementById("score-wrapper");
 
 var numberOfBoxes = 10;
 var SPEED = 1;
@@ -14,48 +16,86 @@ var CONTAINER_BOTTOM = 600 - BOX_SIZE - CONTAINER_BORDER;
 var CONTAINER_LEFT = 0;
 var CONTAINER_RIGHT = 1000 - BOX_SIZE - CONTAINER_BORDER;
 
+var $score = document.getElementById("score");
+var score = 0;
+$score.innerHTML = score;
 
 
+var Container1 = new Container($mainWrapper);
+Container1.init();
+
+//start
 $startButton.onclick = function () {
-    var container1 = new Container($mainWrapper);
-    container1.init();
 
-    this.style.display = "none";
-    $resetButton.style.display = "block";
+    Container1.start();
+    $buttonWrapper.style.display = "none";
 };
 
 $resetButton.onclick = function () {
-  //TODO
+    //TODO
 };
-
-
 
 
 //*****************Container Class Definition************************
 function Container(props) {
 
     var self = this;
+    self.$parent = props.$parent || $mainWrapper;
     self.Boxes = [];
 
-    var addNewContainer = function () {
-        self.$parent = props.$parent || $mainWrapper;
+    //private function variables
+    var addNewContainer;
+    var changeStyles;
+    var createBoxes;
+    var checkBoundingBoxCollision;
+    var reset;
+
+
+    self.init = function () {
+        addNewContainer();
+        // reset();
+    };
+
+
+    self.start = function () {
+        changeStyles();
+        createBoxes();
+        self.interval = setInterval(function () {
+            checkBoundingBoxCollision();
+
+            self.Boxes.forEach(function (box) {
+                box.checkBoundaryCollision();
+            });
+        }, 1);
+    };
+
+    changeStyles = function () {
+        self.$elem.style.display = "block";
+        $scoreWrapper.style.display = "block";
+        $resetButton.style.display = "block";
+    };
+
+    addNewContainer = function () {
         self.$elem = document.createElement("div");
         self.$elem.className = "container";
         self.$parent.appendChild(self.$elem);
 
     };
 
-    var createBoxes = function () {
+
+    createBoxes = function () {
         for (var i = 0; i < numberOfBoxes; i++) {
+            //calling Box Class
             self.Boxes[i] = new Box({
                 x: getRandom(1, 950),
                 y: getRandom(1, 550),
+                dx: getRandom(-1, 1),
+                dy: getRandom(-1, 1),
                 $parent: self.$elem
             });
 
             self.Boxes[i].init();
         }
-
         //adding click events
         self.Boxes.forEach(function (box) {
 
@@ -69,22 +109,31 @@ function Container(props) {
                 setTimeout(function () {
                     that.remove(); // remove
                 }, 800);
+
+                score += 1;
+                $score.innerHTML = score;
             }
         })
     };
 
-    var checkBoundingBoxCollision = function () {
+
+    reset = function () {
+        clearInterval(self.interval);
+        console.log(1)
+    };
+
+
+    checkBoundingBoxCollision = function () {
 
         self.Boxes.forEach(function (box) {
-            // console.log("Ant",ant);
             self.Boxes.forEach(function (otherBox) {
 
                 if (box === otherBox) {
                     return;
                 }
 
-
-                if ((box.x < otherBox.x + BOX_SIZE) && (box.x + BOX_SIZE > otherBox.x) && (box.y < otherBox.y + BOX_SIZE) && (BOX_SIZE + box.y > otherBox.y)) {
+                if ((box.x < otherBox.x + BOX_SIZE) && (box.x + BOX_SIZE > otherBox.x) &&
+                    (box.y < otherBox.y + BOX_SIZE) && (BOX_SIZE + box.y > otherBox.y)) {
 
                     if (box.x < otherBox.x + BOX_SIZE) {
                         box.dx = -1;
@@ -94,7 +143,6 @@ function Container(props) {
                         if (otherBox.x + BOX_SIZE < CONTAINER_RIGHT - BOX_SIZE) {
                             box.x = otherBox.x + BOX_SIZE;
                         }
-
                     }
 
                     if (box.x + BOX_SIZE > otherBox.x) {
@@ -118,8 +166,6 @@ function Container(props) {
                         otherBox.dy = 1;
 
                         otherBox.y = box.y - BOX_SIZE;
-
-
                     }
                 }
             })
@@ -127,29 +173,6 @@ function Container(props) {
 
     };
 
-    var start = function () {
-    createBoxes();
-
-    self.interval =  setInterval(function () {
-            checkBoundingBoxCollision();
-
-            self.Boxes.forEach(function (box) {
-                box.checkBoundaryCollision();
-            });
-
-        }, 100);
-    };
-
-    var reset = function () {
-        clearInterval(self.interval);
-        console.log(1)
-    };
-
-    self.init = function () {
-        addNewContainer();
-        start();
-        // reset();
-    }
 }
 
 
@@ -163,21 +186,34 @@ function Box(props) {
     self.dx = props.dx || 1;
     self.dy = props.dy || 1;
 
+    //private function variables
+    var addNewBoxes;
+    var plotPosition;
+    var updatePosition;
 
-    var addNewBoxes = function () {
+
+    self.init = function () {
+        addNewBoxes();
+        plotPosition();
+    };
+
+
+    addNewBoxes = function () {
         self.$parent = props.$parent;
         self.$elem = document.createElement("div");
+        self.$elem.style.cursor = "pointer";
         self.$elem.className = "ants";
         self.$parent.appendChild(self.$elem);
     };
 
 
-    var plotPosition = function () {
+    plotPosition = function () {
         self.$elem.style.left = self.x + "px";
         self.$elem.style.top = self.y + "px";
     };
 
-    var updatePosition = function () {
+
+    updatePosition = function () {
         self.x = self.x + self.dx * SPEED;
         self.y = self.y + self.dy * SPEED;
     };
@@ -207,11 +243,6 @@ function Box(props) {
         updatePosition();
         plotPosition();
 
-    };
-
-    self.init = function () {
-        addNewBoxes();
-        plotPosition();
     };
 
 }
