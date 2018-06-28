@@ -1,6 +1,6 @@
 var $container = document.getElementById("container");
 
-var numberOfBalls = 10;
+var numberOfBalls = 50;
 var SPEED = 5;
 
 var BALL_SIZE = 50;
@@ -131,7 +131,7 @@ function checkBoundingBoxCollision() {
                     otherAnt.dx = 1;
 
                     //so that it does not overflow container at right
-                    if (otherAnt.x + BALL_SIZE < CONTAINER_RIGHT) {
+                    if (otherAnt.x + BALL_SIZE < CONTAINER_RIGHT-BALL_SIZE) {
                         ant.x = otherAnt.x + BALL_SIZE;
                     }
 
@@ -148,7 +148,7 @@ function checkBoundingBoxCollision() {
                     otherAnt.dy = -1;
 
                     //so that it does not overflow container at bottom
-                    if (otherAnt.y + BALL_SIZE < CONTAINER_BOTTOM) {
+                    if (otherAnt.y + BALL_SIZE < CONTAINER_BOTTOM-BALL_SIZE) {
                         ant.y = otherAnt.y + BALL_SIZE;
                     }
                 }
@@ -158,6 +158,7 @@ function checkBoundingBoxCollision() {
                     otherAnt.dy = 1;
 
                     otherAnt.y = ant.y - BALL_SIZE;
+
 
                 }
             }
