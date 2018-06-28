@@ -1,14 +1,14 @@
 var $container = document.getElementById("container");
 
 var numberOfBalls = 10;
-var SPEED = 25;
+var SPEED = 1;
 
 var BALL_SIZE = 20;
 var CONTAINER_BORDER = 10;
 var CONTAINER_TOP = 0 + CONTAINER_BORDER; //adding offset
-var CONTAINER_BOTTOM = 600 - BALL_SIZE - CONTAINER_BORDER;
+var CONTAINER_BOTTOM = 600 - BALL_SIZE;
 var CONTAINER_LEFT = 0 + CONTAINER_BORDER;
-var CONTAINER_RIGHT = 1000 - BALL_SIZE - CONTAINER_BORDER;
+var CONTAINER_RIGHT = 1000 - BALL_SIZE;
 
 
 var antCollection = [];
@@ -79,7 +79,7 @@ function startInterval() {
             updateDirection(ant);
         });
 
-    }, 150);
+    }, 1);
 
 }
 
