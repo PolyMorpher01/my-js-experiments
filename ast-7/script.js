@@ -1,14 +1,14 @@
 var $container = document.getElementById("container");
 
-var numberOfBalls = 50;
-var SPEED = 5;
+var numberOfBalls = 10;
+var SPEED = 25;
 
-var BALL_SIZE = 50;
+var BALL_SIZE = 20;
 var CONTAINER_BORDER = 10;
 var CONTAINER_TOP = 0 + CONTAINER_BORDER; //adding offset
-var CONTAINER_BOTTOM = 600;
+var CONTAINER_BOTTOM = 600 - BALL_SIZE - CONTAINER_BORDER;
 var CONTAINER_LEFT = 0 + CONTAINER_BORDER;
-var CONTAINER_RIGHT = 1000;
+var CONTAINER_RIGHT = 1000 - BALL_SIZE - CONTAINER_BORDER;
 
 
 var antCollection = [];
@@ -21,7 +21,6 @@ $score.innerHTML = score;
 addAnts();
 
 startInterval();
-
 
 
 //****************function definitions****************************
@@ -42,13 +41,13 @@ function addAnts() {
 
         ant.$ant.className = "ants";
 
-        ant.$ant.style.left =ant.x + "px";
+        ant.$ant.style.left = ant.x + "px";
         ant.$ant.style.top = ant.y + "px";
         $container.appendChild(ant.$ant);
     }
 
     //adding click events
-    antCollection.forEach(function(ant){
+    antCollection.forEach(function (ant) {
         ant.$ant.onclick = function () {
             this.style.background = "url(\'ant-squashed.png\')";
             var self = this;
@@ -57,7 +56,7 @@ function addAnts() {
             antCollection.splice(index, 1);
             setTimeout(function () {
                 self.remove();
-            }, 1000);
+            }, 800);
 
             score += 1;
             $score.innerHTML = score;
@@ -65,7 +64,6 @@ function addAnts() {
     })
 
 }
-
 
 
 function startInterval() {
@@ -76,8 +74,8 @@ function startInterval() {
         antCollection.forEach(function (ant) {
             // var index = antCollection.indexOf(ant);
             checkBoundaryCollision(ant);
-            ant.x =ant.x + ant.dx * SPEED;
-            ant.y =ant.y + ant.dy * SPEED;
+            ant.x = ant.x + ant.dx * SPEED;
+            ant.y = ant.y + ant.dy * SPEED;
             updateDirection(ant);
         });
 
@@ -131,7 +129,7 @@ function checkBoundingBoxCollision() {
                     otherAnt.dx = 1;
 
                     //so that it does not overflow container at right
-                    if (otherAnt.x + BALL_SIZE < CONTAINER_RIGHT-BALL_SIZE) {
+                    if (otherAnt.x + BALL_SIZE < CONTAINER_RIGHT - BALL_SIZE) {
                         ant.x = otherAnt.x + BALL_SIZE;
                     }
 
@@ -148,7 +146,7 @@ function checkBoundingBoxCollision() {
                     otherAnt.dy = -1;
 
                     //so that it does not overflow container at bottom
-                    if (otherAnt.y + BALL_SIZE < CONTAINER_BOTTOM-BALL_SIZE) {
+                    if (otherAnt.y + BALL_SIZE < CONTAINER_BOTTOM - BALL_SIZE) {
                         ant.y = otherAnt.y + BALL_SIZE;
                     }
                 }
