@@ -18,7 +18,7 @@
 }
 
 
-#container{
+.container{
     height: 600px;
     width: 1000px;
     background: lightskyblue;
@@ -38,4 +38,13 @@
     /*background: url("ant.png");*/
     /*border-radius: 50%;*/
     position: absolute;
+}
+
+.button-wrapper button{
+    margin-top: 20px;
+    padding: 10px;
+}
+
+#reset{
+    display: none;
 }
