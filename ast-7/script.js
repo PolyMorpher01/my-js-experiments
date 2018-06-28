@@ -1,5 +1,4 @@
 var $container = document.getElementById("container");
-var $ants = document.getElementsByClassName("ants");
 
 var numberOfBalls = getRandom(5,15);
 var speed = 20;
@@ -73,12 +72,6 @@ function startInterval() {
             antCollection[index].y = antCollection[index].y + antCollection[index].dy * speed;
             updateDirection(antCollection[index]);
         });
-
-        //reload if all ants die
-        if ($ants.length===0){
-            // alert("All ants are squashed! Restart?");
-            location.reload(true);
-        }
 
     }, 200);
 
