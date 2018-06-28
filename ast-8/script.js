@@ -1,39 +1,50 @@
 var $mainWrapper = document.getElementById("main-wrapper");
+var $scoreWrapper = document.getElementById("score-wrapper");
+var $buttonWrapper = document.getElementById("start-wrapper");
 
-var $buttonWrapper = document.getElementById("button-wrapper");
 var $startButton = document.getElementById("start");
 var $resetButton = document.getElementById("reset");
+var $exitButton = document.getElementById("exit");
 
-var $scoreWrapper = document.getElementById("score-wrapper");
+var numberOfBoxes;
 
-var numberOfBoxes = 10;
-var SPEED = 1;
+var $score = document.getElementById("score");
+var score = 0;
+$score.innerHTML = score;
 
-var BOX_SIZE = 20;
+var SPEED = 0.25;
+var BOX_SIZE = 45;
 var CONTAINER_BORDER = 10;
 var CONTAINER_TOP = 0; //adding offset
 var CONTAINER_BOTTOM = 600 - BOX_SIZE - CONTAINER_BORDER;
 var CONTAINER_LEFT = 0;
 var CONTAINER_RIGHT = 1000 - BOX_SIZE - CONTAINER_BORDER;
 
-var $score = document.getElementById("score");
-var score = 0;
-$score.innerHTML = score;
+
+var container1 = new Container($mainWrapper);
+container1.init();
 
 
-var Container1 = new Container($mainWrapper);
-Container1.init();
-
-//start
+//start button
 $startButton.onclick = function () {
 
-    Container1.start();
+    numberOfBoxes = document.getElementById("ant-number").value || 10; //get number of ants
+
+    container1.start();
+
     $buttonWrapper.style.display = "none";
 };
 
+//reset button
 $resetButton.onclick = function () {
-    //TODO
+    container1.reset();
 };
+
+//exit button
+$exitButton.onclick = function () {
+    location.reload();
+};
+
 
 
 //*****************Container Class Definition************************
@@ -48,12 +59,10 @@ function Container(props) {
     var changeStyles;
     var createBoxes;
     var checkBoundingBoxCollision;
-    var reset;
 
 
     self.init = function () {
         addNewContainer();
-        // reset();
     };
 
 
@@ -85,7 +94,8 @@ function Container(props) {
 
     createBoxes = function () {
         for (var i = 0; i < numberOfBoxes; i++) {
-            //calling Box Class
+
+            //making Box objects
             self.Boxes[i] = new Box({
                 x: getRandom(1, 950),
                 y: getRandom(1, 550),
@@ -96,12 +106,14 @@ function Container(props) {
 
             self.Boxes[i].init();
         }
+
         //adding click events
         self.Boxes.forEach(function (box) {
 
             box.$elem.onclick = function () {
                 var that = this;
 
+                box.$elem.style.background = "url(\'ant-squashed.png\') no-repeat";
                 //stop the motion
                 box.dx = 0;
                 box.dy = 0;
@@ -117,9 +129,10 @@ function Container(props) {
     };
 
 
-    reset = function () {
+    self.reset = function () {
         clearInterval(self.interval);
-        console.log(1)
+        self.$elem.innerHTML =''; //delete all child nodes
+        self.start();
     };
 
 
@@ -139,7 +152,7 @@ function Container(props) {
                         box.dx = -1;
                         otherBox.dx = 1;
 
-                        //so that it does not overflow container at right
+                        // so that it does not overflow container at right
                         if (otherBox.x + BOX_SIZE < CONTAINER_RIGHT - BOX_SIZE) {
                             box.x = otherBox.x + BOX_SIZE;
                         }
@@ -202,7 +215,7 @@ function Box(props) {
         self.$parent = props.$parent;
         self.$elem = document.createElement("div");
         self.$elem.style.cursor = "pointer";
-        self.$elem.className = "ants";
+        self.$elem.className = "box";
         self.$parent.appendChild(self.$elem);
     };
 
@@ -252,4 +265,13 @@ function Box(props) {
 function getRandom(min, max) {
     return Math.random() * (max - min + 1) + min;
 }
+
+
+//add enter key event
+document.getElementById("ant-number").addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        $startButton.click();
+    }
+});
 

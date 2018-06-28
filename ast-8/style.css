@@ -27,7 +27,7 @@
 .container{
     height: 600px;
     width: 1000px;
-    background: lightskyblue;
+    background: whitesmoke;
     position: relative;
     /*padding: 5px;*/
     margin: 0 auto;
@@ -38,24 +38,25 @@
 }
 
 
-.ants{
-    width: 50px;
-    height: 50px;
-    background: red;
-    /*background: url("ant.png");*/
+.box{
+    width: 45px;
+    height: 45px;
+    /*background: red;*/
+    background: url("ant.png") no-repeat;
     /*border-radius: 50%;*/
     position: absolute;
 }
 
-#button-wrapper{
+#start-wrapper{
     margin: 0 auto;
     text-align: center;
-    padding-top: 150px;
+    padding-top: 30px;
+    font-size: 2em;
 }
 
-#button-wrapper button{
+#start-wrapper button{
     margin: 0 auto;
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 10px 20px;
     display: block;
 }
@@ -63,5 +64,18 @@
 #reset{
     margin-top: 20px;
     padding: 10px 20px;
-    display: none;
+}
+
+#exit{
+    margin-top: 20px;
+    padding: 10px 20px;
+}
+
+.input-wrapper{
+    margin-top: 20px;
+    font-size: 0.8em;
+}
+
+.input-wrapper input{
+    width: 20%;
 }
