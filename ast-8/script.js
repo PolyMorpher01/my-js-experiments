@@ -12,7 +12,7 @@ var $score = document.getElementById("score");
 var score = 0;
 $score.innerHTML = score;
 
-var SPEED = 0.25;
+var SPEED = 1;
 var BOX_SIZE = 45;
 var CONTAINER_BORDER = 10;
 var CONTAINER_TOP = 0; //adding offset
@@ -21,7 +21,10 @@ var CONTAINER_LEFT = 0;
 var CONTAINER_RIGHT = 1000 - BOX_SIZE - CONTAINER_BORDER;
 
 
-var container1 = new Container($mainWrapper);
+var container1 = new Container({
+    $parent: $mainWrapper
+});
+
 container1.init();
 
 //start button
@@ -44,6 +47,13 @@ $exitButton.onclick = function () {
     location.reload();
 };
 
+//add enter key event
+document.getElementById("ant-number").addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        $startButton.click();
+    }
+});
 
 
 //*****************Container Class Definition************************
@@ -70,7 +80,6 @@ function Container(props) {
         createBoxes();
         self.interval = setInterval(function () {
             checkBoundingBoxCollision();
-
             self.Boxes.forEach(function (box) {
                 box.checkBoundaryCollision();
             });
@@ -106,23 +115,30 @@ function Container(props) {
             self.Boxes[i].init();
         }
 
+        var clickCounter = 0;
         //adding click events
         self.Boxes.forEach(function (box) {
 
-            box.$elem.onclick = function () {
+            box.$elem.onmousedown = function () {
                 var that = this;
+                clickCounter++;
 
-                box.$elem.style.background = "url(\'ant-squashed.png\') no-repeat";
-                //stop the motion
-                box.dx = 0;
-                box.dy = 0;
+                if (clickCounter === 1) {
+                    box.$elem.style.background = "url(\'ant-squashed.png\') no-repeat";
+                    //stop the motion
+                    box.dx = 0;
+                    box.dy = 0;
 
-                setTimeout(function () {
-                    that.remove(); // remove
-                }, 800);
+                    self.Boxes.splice(self.Boxes.indexOf(box), 1);
 
-                score += 1;
-                $score.innerHTML = score;
+                    setTimeout(function () {
+                        that.remove(); // remove
+                        clickCounter = 0;
+                    }, 800);
+
+                    score += 1;
+                    $score.innerHTML = score;
+                }
             }
         })
     };
@@ -130,7 +146,7 @@ function Container(props) {
 
     self.reset = function () {
         clearInterval(self.interval);
-        self.$elem.innerHTML =''; //delete all child nodes
+        self.$elem.innerHTML = ''; //delete all child nodes
         self.start();
     };
 
@@ -152,33 +168,34 @@ function Container(props) {
                         otherBox.dx = 1;
 
                         // so that it does not overflow container at right
-                        if (otherBox.x + BOX_SIZE < CONTAINER_RIGHT - BOX_SIZE) {
-                            box.x = otherBox.x + BOX_SIZE;
-                        }
+                        // if (otherBox.x + BOX_SIZE < CONTAINER_RIGHT - BOX_SIZE) {
+                        //     box.x = otherBox.x + BOX_SIZE;
+                        // }
                     }
 
                     if (box.x + BOX_SIZE > otherBox.x) {
                         box.dx = 1;
                         otherBox.dx = -1;
-                        otherBox.x = box.x - BOX_SIZE;
+                        // otherBox.x = box.x - BOX_SIZE;
                     }
 
                     if (box.y < otherBox.y + BOX_SIZE) {
                         box.dy = 1;
                         otherBox.dy = -1;
 
-                        //so that it does not overflow container at bottom
-                        if (otherBox.y + BOX_SIZE < CONTAINER_BOTTOM - BOX_SIZE) {
-                            box.y = otherBox.y + BOX_SIZE;
-                        }
+                        // so that it does not overflow container at bottom
+                        // if (otherBox.y + BOX_SIZE < CONTAINER_BOTTOM - BOX_SIZE) {
+                        //     box.y = otherBox.y + BOX_SIZE;
+                        // }
                     }
 
                     if (BOX_SIZE + box.y > otherBox.y) {
                         box.dy = -1;
                         otherBox.dy = 1;
 
-                        otherBox.y = box.y - BOX_SIZE;
+                        // otherBox.y = box.y - BOX_SIZE/2;
                     }
+
                 }
             })
         });
@@ -264,13 +281,3 @@ function Box(props) {
 function getRandom(min, max) {
     return Math.random() * (max - min + 1) + min;
 }
-
-
-//add enter key event
-document.getElementById("ant-number").addEventListener("keyup", function(event) {
-    event.preventDefault();
-    if (event.keyCode === 13) {
-        $startButton.click();
-    }
-});
-
