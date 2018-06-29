@@ -5,12 +5,10 @@ var $buttonWrapper = document.getElementById("start-wrapper");
 var $startButton = document.getElementById("start");
 var $resetButton = document.getElementById("reset");
 var $exitButton = document.getElementById("exit");
-
-var numberOfBoxes;
+var $antNumber = document.getElementById("ant-number");
 
 var $score = document.getElementById("score");
-var score = 0;
-$score.innerHTML = score;
+
 
 var SPEED = 1;
 var BOX_SIZE = 45;
@@ -21,47 +19,94 @@ var CONTAINER_LEFT = 0;
 var CONTAINER_RIGHT = 1000 - BOX_SIZE - CONTAINER_BORDER;
 
 
-var container1 = new Container({
-    $parent: $mainWrapper
+
+
+var game = new Game({
+    $startButton: $startButton,
+    $resetButton: $resetButton,
+    $exitButton: $exitButton,
+    $buttonWrapper: $buttonWrapper,
+    $antNumber: $antNumber,
+    $mainWrapper: $mainWrapper,
+    $scoreWrapper: $scoreWrapper,
+    $score: $score
 });
 
-container1.init();
+game.init();
 
-//start button
-$startButton.onclick = function () {
 
-    numberOfBoxes = document.getElementById("ant-number").value || 10; //get number of ants
+//*****************Game Class Definition************************
 
-    container1.start();
+function Game(props) {
 
-    $buttonWrapper.style.display = "none";
-};
+    var self = this;
 
-//reset button
-$resetButton.onclick = function () {
-    container1.reset();
-};
+    self.$startButton = props.$startButton;
+    self.$resetButton = props.$resetButton;
+    self.$buttonWrapper = props.$buttonWrapper;
+    self.$exitButton = props.$exitButton;
+    self.$antNumber = props.$antNumber;
+    self.$mainWrapper = props.$mainWrapper;
+    self.$scoreWrapper = props.$scoreWrapper;
+    self.$score = props.$score;
 
-//exit button
-$exitButton.onclick = function () {
-    location.reload();
-};
 
-//add enter key event
-document.getElementById("ant-number").addEventListener("keyup", function (event) {
-    event.preventDefault();
-    if (event.keyCode === 13) {
-        $startButton.click();
-    }
-});
+    self.init = function () {
+
+        //start button
+        self.$startButton.onclick = function () {
+
+            self.numberOfBoxes = $antNumber.value || 10; //get number of boxes
+
+            self.container1 = new Container({
+                $parent: $mainWrapper,
+                $scoreWrapper: self.$scoreWrapper,
+                $resetButton: self.$resetButton,
+                $score: self.$score,
+                numberOfBoxes: self.numberOfBoxes
+            });
+            self.container1.init();
+
+            self.container1.start();
+
+            self.$buttonWrapper.style.display = "none";
+        };
+
+        //reset button
+        self.$resetButton.onclick = function () {
+            self.container1.reset();
+        };
+
+        //exit button
+        self.$exitButton.onclick = function () {
+            location.reload();
+        };
+
+        //add enter key event
+        self.$antNumber.addEventListener("keyup", function (event) {
+            event.preventDefault();
+            if (event.keyCode === 13) {
+                self.$startButton.click();
+            }
+        });
+
+    };
+
+}
 
 
 //*****************Container Class Definition************************
 function Container(props) {
 
     var self = this;
-    self.$parent = props.$parent || $mainWrapper;
+    self.$parent = props.$parent;
+    self.numberOfBoxes = props.numberOfBoxes;
+    self.$scoreWrapper = props.$scoreWrapper;
+    self.$resetButton = props.$resetButton;
+    self.$score = props.$score;
+
     self.Boxes = [];
+    self.score = 0;
 
     //private function variables
     var addNewContainer;
@@ -72,6 +117,7 @@ function Container(props) {
 
     self.init = function () {
         addNewContainer();
+        self.$score.innerHTML = self.score;
     };
 
 
@@ -88,8 +134,8 @@ function Container(props) {
 
     changeStyles = function () {
         self.$elem.style.display = "block";
-        $scoreWrapper.style.display = "block";
-        $resetButton.style.display = "block";
+        self.$scoreWrapper.style.display = "block";
+        self.$resetButton.style.display = "block";
     };
 
     addNewContainer = function () {
@@ -101,7 +147,7 @@ function Container(props) {
 
 
     createBoxes = function () {
-        for (var i = 0; i < numberOfBoxes; i++) {
+        for (var i = 0; i < self.numberOfBoxes; i++) {
 
             //making Box objects
             self.Boxes[i] = new Box({
@@ -136,8 +182,8 @@ function Container(props) {
                         clickCounter = 0;
                     }, 800);
 
-                    score += 1;
-                    $score.innerHTML = score;
+                    self.score += 1;
+                    self.$score.innerHTML = self.score;
                 }
             }
         })
