@@ -1,4 +1,8 @@
 var $mainWrapper = document.getElementById("main-wrapper");
+var $homeScreen = document.getElementById("home-screen");
+var $gameOverWrapper = document.getElementById("game-over-wrapper");
+var $startButton = document.getElementById("start-button");
+var $finalScore = document.getElementById("final-score");
 
 var CONTAINER_PADDING = 30;
 var CONTAINER_LEFT = 0 + CONTAINER_PADDING;
@@ -13,17 +17,26 @@ var BULLET_SIZE = 10;
 var BULLET_SPEED = 4;
 
 var ENEMY_CAR_SPEED = 2;
-var MAXIMUM_ENEMY_PER_FRAME = 4;
 var ENEMY_HEALTH = 300;
+var ENEMY_SPAWN_DELAY = 60;
 
 var BACKGROUND_UPDATE_SPEED = 2;
+var SCORE_UPDATE_SPEED = 0.1;
+
+var gameStatus = false;
+
+
 
 var newContainer = new Container({
     $mainWrapper: $mainWrapper
 });
 
 newContainer.init();
-newContainer.startGame();
+
+$startButton.onclick = function () {
+    $homeScreen.style.display = "none";
+    newContainer.startGame();
+};
 
 
 // *************Container Class Definition*******************
@@ -33,11 +46,88 @@ function Container(props) {
 
     var Bullets = [];
     var EnemyCars = [];
-    var enemyCarsCounter = 0;
 
-    var score = 0;
+    self.score = 0;
 
-    var addNewContainer = function () {
+    //private function declarations
+    var reset;
+    var addNewContainer;
+    var updateBackgroundPosition;
+    var createGoodCar;
+    var createEnemyCar;
+    var updateEnemyCars;
+    var createNewBullet;
+    var updateBullets;
+    var checkBulletCollision;
+    var checkCarCollision;
+    var addScoreWrapper;
+    var updateScore;
+    var keyDownHandler;
+    var gameOver;
+
+
+    self.init = function () {
+        addNewContainer();
+        createGoodCar();
+        document.onkeydown = keyDownHandler;
+
+    };
+
+    var delayCounter = 0;
+    self.startGame = function () {
+        gameStatus = true;
+
+        self.interval = setInterval(function () {
+            updateBackgroundPosition();
+            updateScore();
+            delayCounter++;
+
+            if (delayCounter > ENEMY_SPAWN_DELAY) {
+                EnemyCars.push(createEnemyCar());
+                delayCounter = 0;
+            }
+
+            if (Bullets.length > 0) {
+                updateBullets();
+            }
+
+            if (EnemyCars.length > 0) {
+                updateEnemyCars();
+            }
+        }, GAME_LOOP_INTERVAL);
+    };
+
+    reset = function () {
+
+        //delete remaining cars
+        var temp_enemy_cars = EnemyCars;
+        for (var i = 0; i < temp_enemy_cars.length; i++) {
+            temp_enemy_cars[i].enemyHealth = 0;
+            temp_enemy_cars[i].destroyEnemyCar();
+            temp_enemy_cars[i] = null;
+        }
+        EnemyCars = clearArray(temp_enemy_cars);
+
+
+        //delete remaining bullets
+        var temp_bullets = Bullets;
+        for (var j = 0; j < temp_bullets.length; j++) {
+            temp_bullets[j].destroyBullet();
+            temp_bullets[j] = null
+        }
+
+        Bullets = clearArray(temp_bullets);
+
+        self.score = 0;
+        delayCounter = 0;
+
+        $gameOverWrapper.style.display = "none";
+
+        $homeScreen.style.display = "block";
+
+    };
+
+    addNewContainer = function () {
         self.$elem = document.createElement("div");
         self.$elem.className = "container-wrapper";
         props.$mainWrapper.appendChild(self.$elem);
@@ -45,8 +135,122 @@ function Container(props) {
         addScoreWrapper();
     };
 
+    var verticalBackgroundPosition = 1;
+    updateBackgroundPosition = function () {
+        verticalBackgroundPosition += BACKGROUND_UPDATE_SPEED;
+        self.$elem.style.backgroundPosition = "0 " + verticalBackgroundPosition + "px";
 
-    var addScoreWrapper = function () {
+    };
+
+    var newGoodCar;
+    createGoodCar = function () {
+        newGoodCar = new GoodCar({
+            x: 130,
+            y: 500,
+            $parent: self.$elem
+        });
+
+        newGoodCar.init();
+    };
+
+    createEnemyCar = function () {
+
+        var enemyCar = new EnemyCar({
+            $parent: self.$elem,
+            score: self.score
+        });
+
+        enemyCar.init();
+        return enemyCar;
+    };
+
+    updateEnemyCars = function () {
+
+        var temp_enemy_cars = EnemyCars;
+
+        for (var i = 0; i < temp_enemy_cars.length; i++) {
+            temp_enemy_cars[i].updatePosition();
+
+            if (checkCarCollision(temp_enemy_cars[i], newGoodCar)) {
+                gameOver();
+            }
+
+            if (temp_enemy_cars[i].y > CONTAINER_BOTTOM) {
+                temp_enemy_cars[i].enemyHealth = 0;
+                temp_enemy_cars[i].destroyEnemyCar();
+                temp_enemy_cars[i] = null
+            }
+        }
+        EnemyCars = clearArray(temp_enemy_cars);
+    };
+
+    createNewBullet = function () {
+        var newBullet = new Bullet({
+            $parent: self.$elem,
+            x: newGoodCar.x + CAR_SIZE / 2 - BULLET_SIZE / 2, //setting the bullet position middle of the car
+            y: newGoodCar.y - BULLET_SIZE
+        });
+
+        newBullet.init();
+
+        return newBullet;
+    };
+
+    updateBullets = function () {
+
+        var temp_bullets = Bullets;
+        for (var i = 0; i < temp_bullets.length; i++) {
+
+            if (temp_bullets[i] != null) {
+
+                temp_bullets[i].updatePosition();
+
+                //remove bullet
+                if (temp_bullets[i].y < CONTAINER_TOP) {
+                    temp_bullets[i].destroyBullet();
+                    temp_bullets[i] = null;
+                    return;
+                }
+
+                if (EnemyCars.length) {
+                    EnemyCars.forEach(function (car) {
+
+                        if (checkBulletCollision(car, temp_bullets[i])) {
+                            temp_bullets[i].destroyBullet();
+                            temp_bullets[i] = null;
+                        }
+
+                    });
+                }
+            }
+        }
+        Bullets = clearArray(temp_bullets);
+
+    };
+
+    checkBulletCollision = function (enemyCar, bullet) {
+        var enemyCarTop = enemyCar.y + CAR_SIZE;
+
+        if (bullet === null) { //TODO
+            return;
+        }
+
+        if (bullet.y < enemyCarTop && (bullet.x >= enemyCar.x && bullet.x <= enemyCar.x + CAR_SIZE)) {
+            if (enemyCar.destroyEnemyCar()) {
+                EnemyCars.splice(EnemyCars.indexOf(enemyCar), 1);
+            }
+            return true;
+        }
+    };
+
+    checkCarCollision = function (enemyCar, goodCar) {
+        var enemyCarTop = enemyCar.y + CAR_SIZE;
+        if (enemyCarTop > goodCar.y && (enemyCar.x + CAR_SIZE > goodCar.x && enemyCar.x < goodCar.x + CAR_SIZE)) {
+            return true;
+        }
+    };
+
+    addScoreWrapper = function () {
         self.$scoreWrapper = document.createElement("div");
         self.$scoreWrapper.className = "score-wrapper";
         self.$elem.appendChild(self.$scoreWrapper);
@@ -59,49 +263,13 @@ function Container(props) {
         updateScore();
     };
 
-    var updateScore = function () {
-        score += 0.05;
-        self.$score.innerHTML = Math.floor(score);
+    updateScore = function () {
+        self.score += SCORE_UPDATE_SPEED;
+        self.$score.innerHTML = Math.floor(self.score);
     };
 
-    var newGoodCar;
-    var createGoodCar = function () {
-        newGoodCar = new GoodCar({
-            x: 130,
-            y: 500,
-            $parent: self.$elem
-        });
-
-        newGoodCar.init();
-    };
-
-
-    var createEnemyCar = function () {
-
-        var enemyCar = new EnemyCar({
-            $parent: self.$elem
-        });
-
-        enemyCar.init();
-        return enemyCar;
-    };
-
-
-    var createNewBullet = function () {
-        var newBullet = new Bullet({
-            $parent: self.$elem,
-            x: newGoodCar.x + CAR_SIZE / 2 - BULLET_SIZE / 2, //setting the bullet position middle of the car
-            y: newGoodCar.y - BULLET_SIZE
-        });
-
-        newBullet.init();
-
-        return newBullet;
-    };
-
-
-    var addKeyEvents = function () {
-        document.onkeydown = function (event) {
+    keyDownHandler = function (event) {
+        if (gameStatus === true) {
             if (event.keyCode === 37) {
                 //LEFT
                 if (!(newGoodCar.x < CONTAINER_LEFT + CAR_SIZE)) {
@@ -120,140 +288,30 @@ function Container(props) {
                 //SPACE_BAR
                 Bullets.push(createNewBullet());
             }
-        };
-    };
+        }
 
-
-    var updateBullets = function () {
-        // var bulletArray = Bullets;
-
-        for (var i = 0; i < Bullets.length; i++) {
-
-            Bullets[i].updatePosition();
-
-            //remove bullet
-            if (Bullets[i].y < CONTAINER_TOP) {
-                Bullets[i].destroyBullet();
-                Bullets.splice(i, 1);
-                return;
-            }
-
-
-            if (EnemyCars.length) {
-                EnemyCars.forEach(function (car) {
-                    if (checkBulletCollision(car, Bullets[i])) {
-                        Bullets[i].destroyBullet();
-                        Bullets.splice(i, 1);
-                        return;
-                    }
-                });
+        else {
+            if (event.keyCode === 27) {
+                //ESCAPE
+                reset();
             }
         }
+
     };
 
+    gameOver = function () {
 
-    var updateEnemyCars = function () {
-
-        for (var i = 0; i < EnemyCars.length; i++) {
-            EnemyCars[i].updatePosition();
-
-            //follow if positions overlap
-            if (i < EnemyCars.length - 1) {
-                if (EnemyCars[i].x === EnemyCars[i + 1].x) {
-                    EnemyCars[i+1].y = EnemyCars[i].y - CAR_SIZE;
-                }
-            }
-
-            if (checkCarCollision(EnemyCars[i], newGoodCar)) {
-                gameOver();
-            }
-
-            if (EnemyCars[i].y > CONTAINER_BOTTOM) {
-                EnemyCars[i].enemyHealth = 0;
-                EnemyCars[i].destroyEnemyCar();
-                enemyCarsCounter--;
-                EnemyCars.splice(i, 1);
-            }
-
-
-        }
-    };
-
-
-    var gameOver = function () {
         clearInterval(self.interval);
-        alert("game over");
-        // location.reload();
+        gameStatus = false;
+        $gameOverWrapper.style.display = "block";
+        $finalScore.innerHTML = Math.floor(self.score);
+
+        $gameOverWrapper.onmousedown = function () {
+            reset();
+        };
+
+        console.log("game over");
     };
-
-
-    var checkBulletCollision = function (enemyCar, bullet) {
-        var enemyCarTop = enemyCar.y + CAR_SIZE;
-
-
-        if (bullet === undefined) { //TODO
-            console.log("aachoo");
-            return;
-        }
-
-        if (bullet.y < enemyCarTop && (bullet.x >= enemyCar.x && bullet.x <= enemyCar.x + CAR_SIZE)) {
-            if (enemyCar.destroyEnemyCar()) {
-                enemyCarsCounter--;
-                EnemyCars.splice(EnemyCars.indexOf(enemyCar), 1);
-            }
-            return true;
-        }
-    };
-
-
-    var checkCarCollision = function (enemyCar, goodCar) {
-        var enemyCarTop = enemyCar.y + CAR_SIZE;
-        if (enemyCarTop > goodCar.y && (enemyCar.x + CAR_SIZE > goodCar.x && enemyCar.x < goodCar.x + CAR_SIZE)) {
-            return true;
-        }
-    };
-
-
-    var verticalBackgroundPosition = 1;
-    var updateBackgroundPosition = function () {
-        verticalBackgroundPosition += BACKGROUND_UPDATE_SPEED;
-        self.$elem.style.backgroundPosition = "0 " + verticalBackgroundPosition + "px";
-
-    };
-
-
-    self.startGame = function () {
-        self.interval = setInterval(function () {
-            updateBackgroundPosition();
-
-            updateScore();
-
-            if (enemyCarsCounter < MAXIMUM_ENEMY_PER_FRAME) {
-                EnemyCars.push(createEnemyCar());
-                enemyCarsCounter++;
-            }
-
-
-            if (Bullets.length > 0) {
-                updateBullets();
-            }
-
-            if (EnemyCars.length > 0) {
-                updateEnemyCars();
-            }
-
-
-        }, GAME_LOOP_INTERVAL);
-    };
-
-
-    self.init = function () {
-        addNewContainer();
-        createGoodCar();
-        addKeyEvents();
-
-    }
-
 }
 
 
@@ -268,24 +326,21 @@ function GoodCar(props) {
     self.$parent = props.$parent;
 
 
+    self.init = function () {
+        addNewCar();
+        self.plotPosition();
+    };
+
     self.plotPosition = function () {
         self.$elem.style.left = self.x + "px";
         self.$elem.style.top = self.y + "px";
     };
-
 
     var addNewCar = function () {
         self.$elem = document.createElement("div");
         self.$elem.className = "car good-car";
         self.$parent.appendChild(self.$elem);
     };
-
-
-    self.init = function () {
-        addNewCar();
-        self.plotPosition();
-    }
-
 }
 
 
@@ -300,15 +355,9 @@ function Bullet(props) {
     self.dy = props.dy || -1;
 
 
-    var addNewBullet = function () {
-        self.$elem = document.createElement("div");
-        self.$elem.className = "bullet";
-        self.$parent.appendChild(self.$elem);
-    };
-
-    var plotPosition = function () {
-        self.$elem.style.left = self.x + "px";
-        self.$elem.style.top = self.y + "px";
+    self.init = function () {
+        addNewBullet();
+        plotPosition();
     };
 
 
@@ -321,11 +370,16 @@ function Bullet(props) {
         self.$elem.remove();
     };
 
-    self.init = function () {
-        addNewBullet();
-        plotPosition();
-    }
+    var addNewBullet = function () {
+        self.$elem = document.createElement("div");
+        self.$elem.className = "bullet";
+        self.$parent.appendChild(self.$elem);
+    };
 
+    var plotPosition = function () {
+        self.$elem.style.left = self.x + "px";
+        self.$elem.style.top = self.y + "px";
+    };
 }
 
 
@@ -334,36 +388,22 @@ function Bullet(props) {
 function EnemyCar(props) {
     var self = this;
     self.x = 0;
-    self.y = CONTAINER_TOP;
+    self.y = CONTAINER_TOP - CAR_SIZE;
     self.dx = props.dx || 0;
     self.dy = props.dy || 0;
     self.$parent = props.$parent;
     self.enemyHealth = ENEMY_HEALTH - 100;
 
-    var getRandomXPosition = function () {
-        var randomValue = getRandom(1, 3);
-        if (randomValue === 1) return 30;
-        if (randomValue === 2) return 130;
-        if (randomValue === 3) return 230;
+    self.score =props.score;
+
+    self.init = function () {
+        addNewEnemyCar();
+        plotPosition();
     };
-
-    self.x = getRandomXPosition();
-
-
-    var plotPosition = function () {
-        self.$elem.style.left = self.x + "px";
-        self.$elem.style.top = self.y + "px";
-    };
-
-
-    var addNewEnemyCar = function () {
-        self.$elem = document.createElement("div");
-        self.$elem.className = "car enemy-car";
-        self.$parent.appendChild(self.$elem);
-    };
-
 
     self.updatePosition = function () {
+        //increase speed with score
+        ENEMY_CAR_SPEED = Math.floor(self.score/100)+2;
         self.y = self.y + ENEMY_CAR_SPEED;
         plotPosition();
     };
@@ -376,15 +416,43 @@ function EnemyCar(props) {
         self.enemyHealth -= 100;
     };
 
-    self.init = function () {
-        addNewEnemyCar();
-        plotPosition();
-    }
+
+    var getRandomXPosition = function () {
+        var randomValue = getRandom(1, 3);
+        if (randomValue === 1) return 30;
+        if (randomValue === 2) return 130;
+        if (randomValue === 3) return 230;
+    };
+    self.x = getRandomXPosition();
+
+
+    var plotPosition = function () {
+        self.$elem.style.left = self.x + "px";
+        self.$elem.style.top = self.y + "px";
+    };
+
+    var addNewEnemyCar = function () {
+        self.$elem = document.createElement("div");
+        self.$elem.className = "car enemy-car";
+        self.$parent.appendChild(self.$elem);
+    };
 
 }
 
 
 //*****************Function Definition*********************
+
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+
+function clearArray(input) {
+    var temp = [];
+    for (var i = 0; i < input.length; i++) {
+        if (input[i] != null) {
+            (temp).push(input[i]);
+        }
+    }
+    return temp;
 }

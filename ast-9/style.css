@@ -1,36 +1,84 @@
+* {
+    font-family: "GAMECUBEN", "Cubic Game", Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 
-.container-wrapper{
+#main-wrapper {
+    position: relative;
+    margin: 0 auto;
+    width: 360px;
+}
+
+#home-screen {
+    position: absolute;
+    width: 360px;
+    height: 600px;
+    background: url("transparentBackground.png");
+    z-index: 1;
+}
+
+#home-screen #start-button {
+    width: 100px;
+    height: 50px;
+    margin-top: 400px;
+    margin-left: 130px;
+    border: 1px #ffffff solid;
+    text-align: center;
+}
+
+#home-screen #start-button .text{
+    display: inline-block;
+    color: white;
+    padding-top: 15px;
+}
+
+.container-wrapper {
     width: 360px;
     height: 600px;
     background: url("background.png") repeat-y;
     background-color: black;
     background-position: 0 1px;
-    position: relative;
+    position: absolute;
     overflow: hidden;
+    /*display: none;*/
+    z-index: -1;
 }
 
-#main-wrapper{
-    /*position: relative;*/
-    margin: 0 auto;
+#game-over-wrapper {
     width: 360px;
+    height: 500px;
+    position: absolute;
+    z-index: 10;
+    background: url("transparentBackground.png");
+    display: none;
+
+    color: red;
+    font-size: 50px;
+    text-align: center;
+    padding-top: 100px;
+
 }
 
-.car{
+#game-over-wrapper .message {
+    color: white;
+    font-size: 15px;
+}
+
+.car {
     position: absolute;
     height: 100px;
     width: 100px;
     border: 1px #ffffff solid;
 }
 
-.good-car{
+.good-car {
     background-color: limegreen;
 }
 
-.enemy-car{
+.enemy-car {
     background-color: red;
 }
 
-.bullet{
+.bullet {
     height: 10px;
     width: 10px;
     position: absolute;
@@ -38,14 +86,19 @@
     border-radius: 50%;
 }
 
-.score-wrapper{
+.score-wrapper {
     position: absolute;
     left: 0;
     top: 0;
-    width:200px;
+    width: 200px;
     padding-left: 10px;
-    padding-top: 20px;
-    font-size: 30px;
+    font-size: 20px;
     color: white;
-    z-index: 1;
+    z-index: 4;
+}
+
+#final-score-wrapper {
+    font-size: 40px;
+    text-align: center;
+    color: white;
 }
