@@ -19,6 +19,7 @@
     position: absolute;
     height: 100px;
     width: 100px;
+    border: 1px #ffffff solid;
 }
 
 .good-car{
@@ -42,8 +43,8 @@
     left: 0;
     top: 0;
     width:200px;
-    margin-left: 10px;
-    margin-top: 20px;
+    padding-left: 10px;
+    padding-top: 20px;
     font-size: 30px;
     color: white;
     z-index: 1;

@@ -13,7 +13,7 @@ var BULLET_SIZE = 10;
 var BULLET_SPEED = 4;
 
 var ENEMY_CAR_SPEED = 2;
-var MAXIMUM_ENEMY_PER_FRAME = 2;
+var MAXIMUM_ENEMY_PER_FRAME = 4;
 var ENEMY_HEALTH = 300;
 
 var BACKGROUND_UPDATE_SPEED = 2;
@@ -60,8 +60,8 @@ function Container(props) {
     };
 
     var updateScore = function () {
-        score++;
-        self.$score.innerHTML = score;
+        score += 0.05;
+        self.$score.innerHTML = Math.floor(score);
     };
 
     var newGoodCar;
@@ -125,36 +125,44 @@ function Container(props) {
 
 
     var updateBullets = function () {
+        // var bulletArray = Bullets;
+
         for (var i = 0; i < Bullets.length; i++) {
 
             Bullets[i].updatePosition();
 
+            //remove bullet
+            if (Bullets[i].y < CONTAINER_TOP) {
+                Bullets[i].destroyBullet();
+                Bullets.splice(i, 1);
+                return;
+            }
+
 
             if (EnemyCars.length) {
                 EnemyCars.forEach(function (car) {
-
-                    var collisionWithEnemy = checkBulletCollision(car, Bullets[i])
-                    if(collisionWithEnemy){
+                    if (checkBulletCollision(car, Bullets[i])) {
                         Bullets[i].destroyBullet();
-                        Bullets.splice(i,1);
+                        Bullets.splice(i, 1);
                         return;
                     }
                 });
             }
-
-            //remove bullet
-            if (Bullets[i].y < CONTAINER_TOP) {
-                Bullets[i].destroyBullet();
-                Bullets.splice(i,1);
-            }
-
         }
     };
 
 
     var updateEnemyCars = function () {
+
         for (var i = 0; i < EnemyCars.length; i++) {
             EnemyCars[i].updatePosition();
+
+            //follow if positions overlap
+            if (i < EnemyCars.length - 1) {
+                if (EnemyCars[i].x === EnemyCars[i + 1].x) {
+                    EnemyCars[i+1].y = EnemyCars[i].y - CAR_SIZE;
+                }
+            }
 
             if (checkCarCollision(EnemyCars[i], newGoodCar)) {
                 gameOver();
@@ -164,7 +172,7 @@ function Container(props) {
                 EnemyCars[i].enemyHealth = 0;
                 EnemyCars[i].destroyEnemyCar();
                 enemyCarsCounter--;
-                EnemyCars.splice(i,1);
+                EnemyCars.splice(i, 1);
             }
 
 
@@ -181,11 +189,17 @@ function Container(props) {
 
     var checkBulletCollision = function (enemyCar, bullet) {
         var enemyCarTop = enemyCar.y + CAR_SIZE;
+
+
+        if (bullet === undefined) { //TODO
+            console.log("aachoo");
+            return;
+        }
+
         if (bullet.y < enemyCarTop && (bullet.x >= enemyCar.x && bullet.x <= enemyCar.x + CAR_SIZE)) {
             if (enemyCar.destroyEnemyCar()) {
-                console.log(1);
                 enemyCarsCounter--;
-                EnemyCars.splice(EnemyCars.indexOf(enemyCar), 1)
+                EnemyCars.splice(EnemyCars.indexOf(enemyCar), 1);
             }
             return true;
         }
@@ -324,7 +338,7 @@ function EnemyCar(props) {
     self.dx = props.dx || 0;
     self.dy = props.dy || 0;
     self.$parent = props.$parent;
-    self.enemyHealth = ENEMY_HEALTH;
+    self.enemyHealth = ENEMY_HEALTH - 100;
 
     var getRandomXPosition = function () {
         var randomValue = getRandom(1, 3);
@@ -355,7 +369,6 @@ function EnemyCar(props) {
     };
 
     self.destroyEnemyCar = function () {
-        console.log(self.enemyHealth);
         if (self.enemyHealth === 0) {
             self.$elem.remove();
             return true;
