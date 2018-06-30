@@ -5,6 +5,7 @@
     background: url("background.jpg") repeat-y;
     background-position: 0 1px;
     position: relative;
+    overflow: hidden;
 }
 
 #main-wrapper{
@@ -17,6 +18,20 @@
     position: absolute;
     height: 100px;
     width: 100px;
-    background-color: green;
 }
 
+.good-car{
+    background-color: limegreen;
+}
+
+.enemy-car{
+    background-color: red;
+}
+
+.bullet{
+    height: 10px;
+    width: 10px;
+    position: absolute;
+    background-color: rebeccapurple;
+    border-radius: 50%;
+}
