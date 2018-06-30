@@ -1,5 +1,5 @@
 * {
-    font-family: "GAMECUBEN", "Cubic Game", Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 #main-wrapper {
@@ -12,7 +12,7 @@
     position: absolute;
     width: 360px;
     height: 600px;
-    background: url("transparentBackground.png");
+    background: url("images/transparentBackground.png");
     z-index: 1;
 }
 
@@ -23,6 +23,7 @@
     margin-left: 130px;
     border: 1px #ffffff solid;
     text-align: center;
+    cursor: url("images/cursor.png"),auto;
 }
 
 #home-screen #start-button .text{
@@ -34,7 +35,7 @@
 .container-wrapper {
     width: 360px;
     height: 600px;
-    background: url("background.png") repeat-y;
+    background: url("images/starBackground.png") repeat;
     background-color: black;
     background-position: 0 1px;
     position: absolute;
@@ -48,7 +49,7 @@
     height: 500px;
     position: absolute;
     z-index: 10;
-    background: url("transparentBackground.png");
+    background: url("images/transparentBackground.png") no-repeat;
     display: none;
 
     color: red;
@@ -65,24 +66,24 @@
 
 .car {
     position: absolute;
-    height: 100px;
     width: 100px;
-    border: 1px #ffffff solid;
 }
 
 .good-car {
-    background-color: limegreen;
+    height: 75px;
+    background: url("images/player.png") no-repeat;
 }
 
 .enemy-car {
-    background-color: red;
+    height: 50px;
+    background: url("images/enemyShip.png") no-repeat;
 }
 
 .bullet {
-    height: 10px;
-    width: 10px;
+    height: 33px;
+    width: 9px;
     position: absolute;
-    background-color: rebeccapurple;
+    background: url("images/laserRed.png") no-repeat;
     border-radius: 50%;
 }
 
@@ -101,4 +102,8 @@
     font-size: 40px;
     text-align: center;
     color: white;
+}
+
+audio{
+    display: none;
 }

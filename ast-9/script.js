@@ -7,16 +7,18 @@ var $finalScore = document.getElementById("final-score");
 var CONTAINER_PADDING = 30;
 var CONTAINER_LEFT = 0 + CONTAINER_PADDING;
 var CONTAINER_RIGHT = 360 - CONTAINER_PADDING;
-var CAR_SIZE = 100;
+var CAR_WIDTH = 100;
+var PLAYER_CAR_HEIGHT = 75;
+var ENEMY_CAR_HEIGHT = 50;
 var CONTAINER_TOP = 0;
 var CONTAINER_BOTTOM = 600;
 
 var GAME_LOOP_INTERVAL = 20;
 
-var BULLET_SIZE = 10;
-var BULLET_SPEED = 4;
+var BULLET_HEIGHT = 33;
+var BULLET_WIDTH = 9;
+var BULLET_SPEED = 50;
 
-var ENEMY_CAR_SPEED = 2;
 var ENEMY_HEALTH = 300;
 var ENEMY_SPAWN_DELAY = 60;
 
@@ -75,6 +77,7 @@ function Container(props) {
 
     var delayCounter = 0;
     self.startGame = function () {
+        playStartSound();
         gameStatus = true;
 
         self.interval = setInterval(function () {
@@ -187,12 +190,12 @@ function Container(props) {
     createNewBullet = function () {
         var newBullet = new Bullet({
             $parent: self.$elem,
-            x: newGoodCar.x + CAR_SIZE / 2 - BULLET_SIZE / 2, //setting the bullet position middle of the car
-            y: newGoodCar.y - BULLET_SIZE
+            x: newGoodCar.x + CAR_WIDTH / 2 - BULLET_WIDTH / 2, //setting the bullet position middle of the car
+            y: newGoodCar.y - BULLET_HEIGHT
         });
 
         newBullet.init();
-
+        playBulletSound();
         return newBullet;
     };
 
@@ -229,23 +232,25 @@ function Container(props) {
     };
 
     checkBulletCollision = function (enemyCar, bullet) {
-        var enemyCarTop = enemyCar.y + CAR_SIZE;
+        var enemyCarTop = enemyCar.y + ENEMY_CAR_HEIGHT;
 
         if (bullet === null) { //TODO
             return;
         }
 
-        if (bullet.y < enemyCarTop && (bullet.x >= enemyCar.x && bullet.x <= enemyCar.x + CAR_SIZE)) {
+        if (bullet.y < enemyCarTop && (bullet.x >= enemyCar.x && bullet.x <= enemyCar.x + CAR_WIDTH)) {
             if (enemyCar.destroyEnemyCar()) {
                 EnemyCars.splice(EnemyCars.indexOf(enemyCar), 1);
+                playExplosionSound();
             }
             return true;
         }
     };
 
     checkCarCollision = function (enemyCar, goodCar) {
-        var enemyCarTop = enemyCar.y + CAR_SIZE;
-        if (enemyCarTop > goodCar.y && (enemyCar.x + CAR_SIZE > goodCar.x && enemyCar.x < goodCar.x + CAR_SIZE)) {
+        var enemyCarTop = enemyCar.y + ENEMY_CAR_HEIGHT;
+        if (enemyCarTop > goodCar.y && (enemyCar.x + CAR_WIDTH > goodCar.x && enemyCar.x < goodCar.x + CAR_WIDTH)) {
+            playCarExplosionSound();
             return true;
         }
     };
@@ -272,14 +277,16 @@ function Container(props) {
         if (gameStatus === true) {
             if (event.keyCode === 37) {
                 //LEFT
-                if (!(newGoodCar.x < CONTAINER_LEFT + CAR_SIZE)) {
+                playKeySound();
+                if (!(newGoodCar.x < CONTAINER_LEFT + CAR_WIDTH)) {
                     newGoodCar.x -= 100;
                     newGoodCar.plotPosition();
                 }
             }
             else if (event.keyCode === 39) {
                 //RIGHT
-                if (!(newGoodCar.x > CONTAINER_RIGHT - CAR_SIZE * 2)) {
+                playKeySound();
+                if (!(newGoodCar.x > CONTAINER_RIGHT - CAR_WIDTH * 2)) {
                     newGoodCar.x += 100;
                     newGoodCar.plotPosition();
                 }
@@ -293,6 +300,7 @@ function Container(props) {
         else {
             if (event.keyCode === 27) {
                 //ESCAPE
+                playKeySound();
                 reset();
             }
         }
@@ -307,11 +315,53 @@ function Container(props) {
         $finalScore.innerHTML = Math.floor(self.score);
 
         $gameOverWrapper.onmousedown = function () {
+            playKeySound();
             reset();
         };
+        playGameOverSound();
 
         console.log("game over");
     };
+
+
+    var playStartSound = function () {
+        self.startSound = document.createElement("audio");
+        self.startSound.src = "sounds/start.wav";
+        self.startSound.play();
+    };
+
+    var playBulletSound = function () {
+        self.bulletSound = document.createElement("audio");
+        self.bulletSound.src = "sounds/shoot.wav";
+        self.bulletSound.play();
+    };
+
+    var playGameOverSound = function () {
+        self.gameOverSound = document.createElement("audio");
+        self.gameOverSound.src = "sounds/dead.mp3";
+        self.gameOverSound.play();
+    };
+
+    var playExplosionSound = function () {
+        self.explosionSound = document.createElement("audio");
+        self.explosionSound.src = "sounds/explosion.wav";
+        self.explosionSound.play();
+    };
+
+    var playCarExplosionSound = function () {
+        self.carExplosionSound = document.createElement("audio");
+        self.carExplosionSound.src = "sounds/carExplosion.wav";
+        self.carExplosionSound.play();
+    };
+
+
+
+    var playKeySound = function () {
+        self.keySound = document.createElement("audio");
+        self.keySound.src = "sounds/keyPress.wav";
+        self.keySound.play();
+    };
+
 }
 
 
@@ -388,7 +438,7 @@ function Bullet(props) {
 function EnemyCar(props) {
     var self = this;
     self.x = 0;
-    self.y = CONTAINER_TOP - CAR_SIZE;
+    self.y = CONTAINER_TOP - ENEMY_CAR_HEIGHT;
     self.dx = props.dx || 0;
     self.dy = props.dy || 0;
     self.$parent = props.$parent;
@@ -401,10 +451,11 @@ function EnemyCar(props) {
         plotPosition();
     };
 
+    var enemyCarSpeed = 1;
     self.updatePosition = function () {
         //increase speed with score
-        ENEMY_CAR_SPEED = Math.floor(self.score/100)+2;
-        self.y = self.y + ENEMY_CAR_SPEED;
+        enemyCarSpeed = Math.floor(self.score/100)+1;
+        self.y = self.y + enemyCarSpeed;
         plotPosition();
     };
 
@@ -436,6 +487,7 @@ function EnemyCar(props) {
         self.$elem.className = "car enemy-car";
         self.$parent.appendChild(self.$elem);
     };
+
 
 }
 
