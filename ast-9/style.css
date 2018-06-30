@@ -2,7 +2,8 @@
 .container-wrapper{
     width: 360px;
     height: 600px;
-    background: url("background.jpg") repeat-y;
+    background: url("background.png") repeat-y;
+    background-color: black;
     background-position: 0 1px;
     position: relative;
     overflow: hidden;
@@ -34,4 +35,16 @@
     position: absolute;
     background-color: rebeccapurple;
     border-radius: 50%;
+}
+
+.score-wrapper{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width:200px;
+    margin-left: 10px;
+    margin-top: 20px;
+    font-size: 30px;
+    color: white;
+    z-index: 1;
 }
