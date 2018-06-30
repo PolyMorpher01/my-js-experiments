@@ -7,3 +7,4 @@
 * [assignment -6 (Two Bouncing Ball)](https://polymorpher01.github.io/my-js-experiments/ast-6/)
 * [assignment -7 (Ant Smasher-Imroved)](https://polymorpher01.github.io/my-js-experiments/ast-7/)
 * [assignment -8 (Ant Smasher-Imroved 2.0)](https://polymorpher01.github.io/my-js-experiments/ast-8/)
+* [assignment -9 (Space Shooter)](https://polymorpher01.github.io/my-js-experiments/ast-9/)
