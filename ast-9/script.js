@@ -76,7 +76,7 @@ function Container(props) {
     };
 
 
-    var createEnemyCars = function () {
+    var createEnemyCar = function () {
 
         var enemyCar = new EnemyCar({
             $parent: self.$elem
@@ -129,18 +129,23 @@ function Container(props) {
 
             Bullets[i].updatePosition();
 
-            var collisionWithEnemy = false;
 
             if (EnemyCars.length) {
                 EnemyCars.forEach(function (car) {
-                    collisionWithEnemy = checkBulletCollision(car, Bullets[i])
+
+                    var collisionWithEnemy = checkBulletCollision(car, Bullets[i])
+                    if(collisionWithEnemy){
+                        Bullets[i].destroyBullet();
+                        Bullets.splice(i,1);
+                        return;
+                    }
                 });
             }
 
             //remove bullet
-            if (Bullets[i].y < CONTAINER_TOP || collisionWithEnemy) {
+            if (Bullets[i].y < CONTAINER_TOP) {
                 Bullets[i].destroyBullet();
-                Bullets.splice(i, 1);
+                Bullets.splice(i,1);
             }
 
         }
@@ -151,16 +156,17 @@ function Container(props) {
         for (var i = 0; i < EnemyCars.length; i++) {
             EnemyCars[i].updatePosition();
 
-            if (EnemyCars[i].y > CONTAINER_BOTTOM) {
-                EnemyCars[i].enemyHealth = 0;
-                EnemyCars[i].destroyEnemyCar();
-                EnemyCars.splice(i, 1);
-                enemyCarsCounter--;
-            }
-
             if (checkCarCollision(EnemyCars[i], newGoodCar)) {
                 gameOver();
             }
+
+            if (EnemyCars[i].y > CONTAINER_BOTTOM) {
+                EnemyCars[i].enemyHealth = 0;
+                EnemyCars[i].destroyEnemyCar();
+                enemyCarsCounter--;
+                EnemyCars.splice(i,1);
+            }
+
 
         }
     };
@@ -177,6 +183,7 @@ function Container(props) {
         var enemyCarTop = enemyCar.y + CAR_SIZE;
         if (bullet.y < enemyCarTop && (bullet.x >= enemyCar.x && bullet.x <= enemyCar.x + CAR_SIZE)) {
             if (enemyCar.destroyEnemyCar()) {
+                console.log(1);
                 enemyCarsCounter--;
                 EnemyCars.splice(EnemyCars.indexOf(enemyCar), 1)
             }
@@ -208,7 +215,7 @@ function Container(props) {
             updateScore();
 
             if (enemyCarsCounter < MAXIMUM_ENEMY_PER_FRAME) {
-                EnemyCars.push(createEnemyCars());
+                EnemyCars.push(createEnemyCar());
                 enemyCarsCounter++;
             }
 
