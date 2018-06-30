@@ -1,0 +1,22 @@
+
+.container-wrapper{
+    width: 360px;
+    height: 600px;
+    background: url("background.jpg") repeat-y;
+    background-position: 0 1px;
+    position: relative;
+}
+
+#main-wrapper{
+    /*position: relative;*/
+    margin: 0 auto;
+    width: 360px;
+}
+
+.car{
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    background-color: green;
+}
+
