@@ -17,26 +17,46 @@
 }
 
 #home-screen #start-button {
-    width: 100px;
-    height: 50px;
-    margin-top: 400px;
-    margin-left: 130px;
-    border: 1px #ffffff solid;
+    width: 150px;
+    height: 70px;
+    margin: 0 auto;
+    margin-top: 60px;
+    border: 4px #ffffff solid;
     text-align: center;
     cursor: url("images/cursor.png"),auto;
+    border-radius: 10px;
+    transform: perspective(400px) rotateX(25deg);
+    -ms-transform: perspective(400px) rotateX(25deg);
+    /*transform-origin: 50% 100%;*/
 }
 
 #home-screen #start-button .text{
     display: inline-block;
     color: white;
-    padding-top: 15px;
+    padding-top: 20px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#home-screen .home-screen-text{
+    color: white;
+    font-size: 70px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 80px;
+    transform: perspective(400px) rotateX(35deg);
+    -ms-transform: perspective(400px) rotateX(25deg);
+}
+
+#home-screen .home-screen-text .inner-text{
+    font-size: 15px;
+    margin-top: 80px;
 }
 
 .container-wrapper {
     width: 360px;
     height: 600px;
     background: url("images/starBackground.png") repeat;
-    background-color: black;
     background-position: 0 1px;
     position: absolute;
     overflow: hidden;
