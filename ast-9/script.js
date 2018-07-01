@@ -351,7 +351,7 @@ function Container(props) {
         self.$scoreWrapper = document.createElement("div");
         self.$scoreWrapper.className = "score-wrapper";
         self.$elem.appendChild(self.$scoreWrapper);
-        self.$scoreWrapper.innerHTML = "Score";
+        // self.$scoreWrapper.innerHTML = "Score";
 
         self.$score = document.createElement("span");
         self.$score.style.display = "block";

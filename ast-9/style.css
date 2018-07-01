@@ -18,13 +18,14 @@
     height: 600px;
     background: url("images/transparentBackground.png");
     z-index: 1;
+    overflow: hidden;
 }
 
 #home-screen #start-button {
     width: 150px;
     height: 70px;
     margin: 0 auto;
-    margin-top: 60px;
+    margin-top: 80px;
     border: 4px #ffffff solid;
     text-align: center;
     cursor: url("images/cursor.png"),auto;
@@ -48,13 +49,22 @@
     font-weight: bold;
     text-align: center;
     margin-top: 80px;
-    transform: perspective(400px) rotateX(35deg);
-    -ms-transform: perspective(400px) rotateX(25deg);
+    transform: perspective(200px) rotateX(35deg);
+    -ms-transform: perspective(200px) rotateX(25deg);
+    text-shadow:
+            -3px -3px 0 lightgreen,
+            3px -3px 0 lightgreen,
+            -3px 3px 0 lightgreen,
+            3px 3px 0 lightgreen;
 }
 
 #home-screen .home-screen-text .inner-text{
-    font-size: 15px;
-    margin-top: 80px;
+    transform: perspective(400px) rotateX(35deg);
+    -ms-transform: perspective(400px) rotateX(25deg);
+    font-size: 10px;
+    margin-top: 60px;
+    text-shadow: none;
+    color: lightgreen;
 }
 
 .container-wrapper {
@@ -119,11 +129,16 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 200px;
+    width: 50px;
     padding-left: 10px;
     font-size: 20px;
-    color: white;
+    background-color: white;
+    color: mediumpurple;
     z-index: 4;
+    opacity: 0.6;
+    margin: 6px 0 0 10px;
+    text-align: center;
+    border-radius: 6px;
 }
 
 #final-score-wrapper {
