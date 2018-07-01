@@ -25,20 +25,58 @@ var ENEMY_SPAWN_DELAY = 60;
 var BACKGROUND_UPDATE_SPEED = 2;
 var SCORE_UPDATE_SPEED = 0.1;
 
-var gameStatus = false;
+
+//*******************Variable Declaration Ends here ***************************
 
 
-
-var newContainer = new Container({
-    $mainWrapper: $mainWrapper
+//Create New Game
+var newGame = new Game({
+    $parent: $mainWrapper,
+    $startButton: $startButton,
+    $homeScreen: $homeScreen,
+    $gameOverWrapper: $gameOverWrapper,
+    $finalScore: $finalScore
 });
+newGame.init();
 
-newContainer.init();
 
-$startButton.onclick = function () {
-    $homeScreen.style.display = "none";
-    newContainer.startGame();
-};
+//*****************Game Class Definition*********************
+
+function Game(props) {
+
+    var self = this;
+
+    self.$parent = props.$parent;
+    self.$startButton = props.$startButton;
+    self.$homeScreen = props.$homeScreen;
+    self.$gameOverWrapper = props.$gameOverWrapper;
+    self.$finalScore = props.$finalScore;
+
+    self.init = function () {
+        createNewContainer();
+        addStartEvent();
+    };
+
+    var newContainer;
+    var createNewContainer = function () {
+        newContainer = new Container({
+            $parent: self.$parent,
+            $homeScreen: self.$homeScreen,
+            $gameOverWrapper: self.$gameOverWrapper,
+            $finalScore: self.$finalScore
+        });
+
+        newContainer.init();
+    };
+
+    var addStartEvent = function () {
+        self.$startButton.onclick = function () {
+            self.$homeScreen.style.display = "none";
+            newContainer.startGame();
+        };
+    };
+
+}
 
 
 // *************Container Class Definition*******************
@@ -46,10 +84,18 @@ function Container(props) {
 
     var self = this;
 
-    var Bullets = [];
-    var EnemyCars = [];
+
+    self.$parent = props.$parent;
+    self.$homeScreen = props.$homeScreen;
+    self.$gameOverWrapper = props.$gameOverWrapper;
+    self.$finalScore = props.$finalScore;
+
 
     self.score = 0;
+
+    var Bullets = [];
+    var EnemyCars = [];
+    var gameStatus = false;
 
     //private function declarations
     var reset;
@@ -66,13 +112,18 @@ function Container(props) {
     var updateScore;
     var keyDownHandler;
     var gameOver;
+    var playStartSound;
+    var playBulletSound;
+    var playGameOverSound;
+    var playExplosionSound;
+    var playCarExplosionSound;
+    var playKeySound;
 
 
     self.init = function () {
         addNewContainer();
         createPlayerCar();
         document.onkeydown = keyDownHandler;
-
     };
 
     var delayCounter = 0;
@@ -124,16 +175,16 @@ function Container(props) {
         self.score = 0;
         delayCounter = 0;
 
-        $gameOverWrapper.style.display = "none";
+        self.$gameOverWrapper.style.display = "none";
 
-        $homeScreen.style.display = "block";
+        self.$homeScreen.style.display = "block";
 
     };
 
     addNewContainer = function () {
         self.$elem = document.createElement("div");
         self.$elem.className = "container-wrapper";
-        props.$mainWrapper.appendChild(self.$elem);
+        self.$parent.appendChild(self.$elem);
 
         addScoreWrapper();
     };
@@ -204,7 +255,7 @@ function Container(props) {
         var temp_bullets = Bullets;
         for (var i = 0; i < temp_bullets.length; i++) {
 
-            if (temp_bullets[i] != null) {
+            if (temp_bullets[i] !== null) {
 
                 temp_bullets[i].updatePosition();
 
@@ -308,53 +359,51 @@ function Container(props) {
     };
 
     gameOver = function () {
-
+        playGameOverSound();
         clearInterval(self.interval);
         gameStatus = false;
-        $gameOverWrapper.style.display = "block";
-        $finalScore.innerHTML = Math.floor(self.score);
+        self.$gameOverWrapper.style.display = "block";
+        self.$finalScore.innerHTML = Math.floor(self.score);
 
-        $gameOverWrapper.onmousedown = function () {
+        self.$gameOverWrapper.onmousedown = function () {
             playKeySound();
             reset();
         };
-        playGameOverSound();
     };
 
 
-    var playStartSound = function () {
+    //Sound Functions
+    playStartSound = function () {
         self.startSound = document.createElement("audio");
         self.startSound.src = "sounds/start.wav";
         self.startSound.play();
     };
 
-    var playBulletSound = function () {
+    playBulletSound = function () {
         self.bulletSound = document.createElement("audio");
         self.bulletSound.src = "sounds/shoot.wav";
         self.bulletSound.play();
     };
 
-    var playGameOverSound = function () {
+    playGameOverSound = function () {
         self.gameOverSound = document.createElement("audio");
         self.gameOverSound.src = "sounds/dead.mp3";
         self.gameOverSound.play();
     };
 
-    var playExplosionSound = function () {
+    playExplosionSound = function () {
         self.explosionSound = document.createElement("audio");
         self.explosionSound.src = "sounds/explosion.wav";
         self.explosionSound.play();
     };
 
-    var playCarExplosionSound = function () {
+    playCarExplosionSound = function () {
         self.carExplosionSound = document.createElement("audio");
         self.carExplosionSound.src = "sounds/carExplosion.wav";
         self.carExplosionSound.play();
     };
 
-
-
-    var playKeySound = function () {
+    playKeySound = function () {
         self.keySound = document.createElement("audio");
         self.keySound.src = "sounds/keyPress.wav";
         self.keySound.play();
@@ -442,7 +491,7 @@ function EnemyCar(props) {
     self.$parent = props.$parent;
     self.enemyHealth = ENEMY_HEALTH - 100;
 
-    self.score =props.score;
+    self.score = props.score;
 
     self.init = function () {
         addNewEnemyCar();
@@ -452,7 +501,7 @@ function EnemyCar(props) {
     var enemyCarSpeed = 1;
     self.updatePosition = function () {
         //increase speed with score
-        enemyCarSpeed = Math.floor(self.score/100)+1;
+        enemyCarSpeed = Math.floor(self.score / 100) + 1;
         self.y = self.y + enemyCarSpeed;
         plotPosition();
     };
@@ -465,7 +514,6 @@ function EnemyCar(props) {
         self.enemyHealth -= 100;
     };
 
-
     var getRandomXPosition = function () {
         var randomValue = getRandom(1, 3);
         if (randomValue === 1) return 30;
@@ -473,7 +521,6 @@ function EnemyCar(props) {
         if (randomValue === 3) return 230;
     };
     self.x = getRandomXPosition();
-
 
     var plotPosition = function () {
         self.$elem.style.left = self.x + "px";
@@ -500,7 +547,7 @@ function getRandom(min, max) {
 function clearArray(input) {
     var temp = [];
     for (var i = 0; i < input.length; i++) {
-        if (input[i] != null) {
+        if (input[i] !== null) {
             (temp).push(input[i]);
         }
     }
