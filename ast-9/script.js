@@ -55,7 +55,7 @@ function Container(props) {
     var reset;
     var addNewContainer;
     var updateBackgroundPosition;
-    var createGoodCar;
+    var createPlayerCar;
     var createEnemyCar;
     var updateEnemyCars;
     var createNewBullet;
@@ -70,7 +70,7 @@ function Container(props) {
 
     self.init = function () {
         addNewContainer();
-        createGoodCar();
+        createPlayerCar();
         document.onkeydown = keyDownHandler;
 
     };
@@ -145,15 +145,15 @@ function Container(props) {
 
     };
 
-    var newGoodCar;
-    createGoodCar = function () {
-        newGoodCar = new GoodCar({
+    var newPlayerCar;
+    createPlayerCar = function () {
+        newPlayerCar = new PlayerCar({
             x: 130,
             y: 500,
             $parent: self.$elem
         });
 
-        newGoodCar.init();
+        newPlayerCar.init();
     };
 
     createEnemyCar = function () {
@@ -174,7 +174,7 @@ function Container(props) {
         for (var i = 0; i < temp_enemy_cars.length; i++) {
             temp_enemy_cars[i].updatePosition();
 
-            if (checkCarCollision(temp_enemy_cars[i], newGoodCar)) {
+            if (checkCarCollision(temp_enemy_cars[i], newPlayerCar)) {
                 gameOver();
             }
 
@@ -190,8 +190,8 @@ function Container(props) {
     createNewBullet = function () {
         var newBullet = new Bullet({
             $parent: self.$elem,
-            x: newGoodCar.x + CAR_WIDTH / 2 - BULLET_WIDTH / 2, //setting the bullet position middle of the car
-            y: newGoodCar.y - BULLET_HEIGHT
+            x: newPlayerCar.x + CAR_WIDTH / 2 - BULLET_WIDTH / 2, //setting the bullet position middle of the car
+            y: newPlayerCar.y - BULLET_HEIGHT
         });
 
         newBullet.init();
@@ -247,9 +247,9 @@ function Container(props) {
         }
     };
 
-    checkCarCollision = function (enemyCar, goodCar) {
+    checkCarCollision = function (enemyCar, playerCar) {
         var enemyCarTop = enemyCar.y + ENEMY_CAR_HEIGHT;
-        if (enemyCarTop > goodCar.y && (enemyCar.x + CAR_WIDTH > goodCar.x && enemyCar.x < goodCar.x + CAR_WIDTH)) {
+        if (enemyCarTop > playerCar.y && (enemyCar.x + CAR_WIDTH > playerCar.x && enemyCar.x < playerCar.x + CAR_WIDTH)) {
             playCarExplosionSound();
             return true;
         }
@@ -278,17 +278,17 @@ function Container(props) {
             if (event.keyCode === 37) {
                 //LEFT
                 playKeySound();
-                if (!(newGoodCar.x < CONTAINER_LEFT + CAR_WIDTH)) {
-                    newGoodCar.x -= 100;
-                    newGoodCar.plotPosition();
+                if (!(newPlayerCar.x < CONTAINER_LEFT + CAR_WIDTH)) {
+                    newPlayerCar.x -= 100;
+                    newPlayerCar.plotPosition();
                 }
             }
             else if (event.keyCode === 39) {
                 //RIGHT
                 playKeySound();
-                if (!(newGoodCar.x > CONTAINER_RIGHT - CAR_WIDTH * 2)) {
-                    newGoodCar.x += 100;
-                    newGoodCar.plotPosition();
+                if (!(newPlayerCar.x > CONTAINER_RIGHT - CAR_WIDTH * 2)) {
+                    newPlayerCar.x += 100;
+                    newPlayerCar.plotPosition();
                 }
             }
             else if (event.keyCode === 32) {
@@ -319,8 +319,6 @@ function Container(props) {
             reset();
         };
         playGameOverSound();
-
-        console.log("game over");
     };
 
 
@@ -365,8 +363,8 @@ function Container(props) {
 }
 
 
-// *************GoodCar Class Definition*******************
-function GoodCar(props) {
+// *************PlayerCar Class Definition*******************
+function PlayerCar(props) {
     var self = this;
 
     self.x = props.x;
@@ -388,7 +386,7 @@ function GoodCar(props) {
 
     var addNewCar = function () {
         self.$elem = document.createElement("div");
-        self.$elem.className = "car good-car";
+        self.$elem.className = "car player-car";
         self.$parent.appendChild(self.$elem);
     };
 }
