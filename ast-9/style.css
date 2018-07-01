@@ -1,5 +1,9 @@
 * {
     font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #main-wrapper {
