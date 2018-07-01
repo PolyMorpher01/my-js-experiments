@@ -150,3 +150,24 @@
 audio{
     display: none;
 }
+
+.small-explosion{
+    position: absolute;
+    width: 56px;
+    height: 54px;
+    background: url("images/smallExplosion.png") no-repeat;
+}
+
+.big-explosion{
+    position: absolute;
+    width: 62px;
+    height: 71px;
+    background: url("images/bigExplosion.png") no-repeat;
+}
+
+.player-explosion {
+    position: absolute;
+    width: 62px;
+    height: 71px;
+    background: url("images/playerExplosion.png") no-repeat;
+}

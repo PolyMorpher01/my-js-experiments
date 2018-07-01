@@ -24,6 +24,10 @@ var BULLET_HEIGHT = 33;
 var BULLET_WIDTH = 9;
 var BULLET_SPEED = 50;
 
+var SMALL_EXPLOSION_WIDTH = 56;
+var BIG_EXPLOSION_WIDTH = 62;
+var EXPLOSION_TIMEOUT = 100;
+
 var GAME_LOOP_INTERVAL = 20;
 
 var BACKGROUND_UPDATE_SPEED = 2;
@@ -159,7 +163,7 @@ function Container(props) {
         var temp_bullets = Bullets;
         for (var j = 0; j < temp_bullets.length; j++) {
             if (temp_bullets[j] !== null)
-            temp_bullets[j].destroyBullet();
+                temp_bullets[j].destroyBullet();
             temp_bullets[j] = null;
         }
         Bullets = clearArray(temp_bullets);
@@ -299,14 +303,18 @@ function Container(props) {
                     return;
                 }
 
+                var tempX = temp_bullets[i].x;
+                var tempY = temp_bullets[i].y;
                 if (EnemyCars.length) {
                     EnemyCars.forEach(function (car) {
                         if (checkBulletCollision(car, temp_bullets[i])) {
+                            createSmallExplosion(tempX, tempY);
                             temp_bullets[i].destroyBullet();
                             temp_bullets[i] = null;
 
                             //check if enemy health is zero
                             if (car.destroyEnemyCar()) {
+                                createBigExplosion(tempX, tempY);
                                 EnemyCars.splice(EnemyCars.indexOf(car), 1);
                                 playExplosionSound();
                             }
@@ -318,6 +326,7 @@ function Container(props) {
                 if (Meteors.length) {
                     Meteors.forEach(function (meteor) {
                         if (checkBulletCollision(meteor, temp_bullets[i])) {
+                            createSmallExplosion(tempX, tempY);
                             temp_bullets[i].destroyBullet();
                             temp_bullets[i] = null;
                         }
@@ -328,6 +337,40 @@ function Container(props) {
         }
         Bullets = clearArray(temp_bullets);
 
+    };
+
+    var createSmallExplosion = function (bulletX, bulletY) {
+        var x = bulletX - SMALL_EXPLOSION_WIDTH/2;
+        var y = bulletY;
+        var smallExplosion = new Explosion({
+            x: x,
+            y: y,
+            $parent: self.$elem
+        });
+        smallExplosion.createSmallExplosion();
+    };
+
+    var createBigExplosion = function (bulletX, bulletY) {
+        var OFFSET = 20;
+        var x = bulletX - BIG_EXPLOSION_WIDTH/2;
+        var y = bulletY - OFFSET;
+        var bigExplosion = new Explosion({
+            x: x,
+            y: y,
+            $parent: self.$elem
+        });
+        bigExplosion.createBigExplosion();
+    };
+
+    var createPlayerExplosion = function (playerX, playerY) {
+        var x = playerX;
+        var y = playerY;
+        var playerExplosion = new Explosion({
+            x: x,
+            y: y,
+            $parent: self.$elem
+        });
+        playerExplosion.createPlayerExplosion();
     };
 
     var checkBulletCollision = function (enemyCar, bullet) {
@@ -401,6 +444,7 @@ function Container(props) {
 
     var gameOver = function () {
         playGameOverSound();
+        createPlayerExplosion(newPlayerCar.x, newPlayerCar.y);
         clearInterval(self.interval);
         gameStatus = false;
         newPlayerCar.$elem.style.background = "url(\'images/playerDamaged.png\') no-repeat";
@@ -634,10 +678,72 @@ function Meteor(props) {
 
 //**********************Explosion Class Definition**************
 
-function Explosion() {
+function Explosion(props) {
 
+    var self = this;
+    self.x = props.x;
+    self.y = props.y;
+    self.$parent = props.$parent;
+
+
+    self.createSmallExplosion = function () {
+        self.$smallElem = document.createElement("div");
+        self.$smallElem.className = "small-explosion";
+        self.$parent.appendChild(self.$smallElem);
+
+        plotSmallExplosionPosition();
+
+        setTimeout(destroySmallExplosion, EXPLOSION_TIMEOUT);
+    };
+
+    self.createBigExplosion = function () {
+        self.$bigElem = document.createElement("div");
+        self.$bigElem.className = "big-explosion";
+        self.$parent.appendChild(self.$bigElem);
+
+        plotBigExplosionPosition();
+
+        setTimeout(destroyBigExplosion, EXPLOSION_TIMEOUT);
+    };
+
+    self.createPlayerExplosion = function () {
+        self.$playerElem = document.createElement("div");
+        self.$playerElem.className = "player-explosion";
+        self.$parent.appendChild(self.$playerElem);
+        plotPlayerExplosionPosition();
+
+        setTimeout(destroyPlayerExplosion, EXPLOSION_TIMEOUT);
+    };
+
+
+    var plotSmallExplosionPosition = function () {
+        self.$smallElem.style.left = self.x + "px";
+        self.$smallElem.style.top = self.y + "px";
+    };
+
+
+    var plotBigExplosionPosition = function () {
+        self.$bigElem.style.left = self.x + "px";
+        self.$bigElem.style.top = self.y + "px";
+    };
+
+    var plotPlayerExplosionPosition = function () {
+        self.$playerElem.style.left = self.x + "px";
+        self.$playerElem.style.top = self.y + "px";
+    };
+
+    var destroySmallExplosion = function () {
+        self.$smallElem.remove();
+    };
+
+    var destroyBigExplosion = function () {
+        self.$bigElem.remove();
+    };
+
+    var destroyPlayerExplosion = function () {
+        self.$playerElem.remove();
+    };
 }
-
 
 
 //*****************Function Definition*********************
