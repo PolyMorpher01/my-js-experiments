@@ -43,7 +43,6 @@ newGame.init();
 
 
 //*****************Game Class Definition*********************
-
 function Game(props) {
 
     var self = this;
@@ -201,8 +200,8 @@ function Container(props) {
     var newPlayerCar;
     var createPlayerCar = function () {
         newPlayerCar = new PlayerCar({
-            x: 130,
-            y: 522,
+            x: CONTAINER_LEFT + CAR_WIDTH,
+            y: CONTAINER_BOTTOM - PLAYER_CAR_HEIGHT,
             $parent: self.$elem
         });
 
@@ -293,7 +292,7 @@ function Container(props) {
                 temp_bullets[i].updatePosition();
 
                 //remove bullet
-                if (temp_bullets[i].y < CONTAINER_TOP-BULLET_HEIGHT) {
+                if (temp_bullets[i].y < CONTAINER_TOP - BULLET_HEIGHT) {
                     temp_bullets[i].destroyBullet();
                     temp_bullets[i] = null;
                     return;
@@ -524,7 +523,6 @@ function Bullet(props) {
 
 
 //***********************Enemy Car Class Definition*************
-
 function EnemyCar(props) {
     var self = this;
     self.x = 0;
@@ -582,7 +580,6 @@ function EnemyCar(props) {
 
 
 //***********************Meteor Class Definition*************
-
 function Meteor(props) {
     var self = this;
     self.x = 0;
@@ -636,7 +633,6 @@ function Meteor(props) {
 
 
 //*****************Function Definition*********************
-
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
