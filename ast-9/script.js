@@ -158,6 +158,7 @@ function Container(props) {
         //delete remaining bullets
         var temp_bullets = Bullets;
         for (var j = 0; j < temp_bullets.length; j++) {
+            if (temp_bullets[j] !== null)
             temp_bullets[j].destroyBullet();
             temp_bullets[j] = null;
         }
@@ -351,7 +352,6 @@ function Container(props) {
         self.$scoreWrapper = document.createElement("div");
         self.$scoreWrapper.className = "score-wrapper";
         self.$elem.appendChild(self.$scoreWrapper);
-        // self.$scoreWrapper.innerHTML = "Score";
 
         self.$score = document.createElement("span");
         self.$score.style.display = "block";
@@ -630,6 +630,14 @@ function Meteor(props) {
 
 
 }
+
+
+//**********************Explosion Class Definition**************
+
+function Explosion() {
+
+}
+
 
 
 //*****************Function Definition*********************
