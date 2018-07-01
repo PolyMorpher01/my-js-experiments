@@ -293,7 +293,7 @@ function Container(props) {
                 temp_bullets[i].updatePosition();
 
                 //remove bullet
-                if (temp_bullets[i].y < CONTAINER_TOP - BULLET_SPEED) {
+                if (temp_bullets[i].y < CONTAINER_TOP-BULLET_HEIGHT) {
                     temp_bullets[i].destroyBullet();
                     temp_bullets[i] = null;
                     return;
