@@ -24,9 +24,7 @@ var ENEMY_SPAWN_DELAY = 60;
 
 var BACKGROUND_UPDATE_SPEED = 2;
 var SCORE_UPDATE_SPEED = 0.1;
-
-
-//*******************Variable Declaration Ends here ***************************
+//*******************Global Variable Declaration Ends here ***************************
 
 
 //Create New Game
