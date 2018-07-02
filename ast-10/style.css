@@ -1,0 +1,23 @@
+#main-wrapper {
+    position: relative;
+    margin: 0 auto;
+    width: 864px;
+}
+
+
+.container-wrapper{
+    position: absolute;
+    width: 864px;
+    height: 512px;
+    background: url("images/background.png") repeat-x;
+    background-position: 1px 0;
+    overflow: hidden;
+}
+
+.pipe{
+    position: absolute;
+    width: 52px;
+    height: 320px;
+    background: url("images/pipe-green.png") no-repeat;
+}
+
