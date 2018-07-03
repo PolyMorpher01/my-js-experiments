@@ -13,6 +13,28 @@
     width: 864px;
 }
 
+#home-screen {
+    position: absolute;
+    width: 100%;
+    height: 512px;
+    background: url("images/transparentBackground.png") repeat;
+    z-index: 1;
+    overflow: hidden;
+}
+
+
+
+#home-screen .home-screen-message {
+    width: 184px;
+    height: 267px;
+    margin: 0 auto;
+    margin-top: 123px;
+    background: url("images/homeScreen.png") no-repeat;
+    z-index: 2;
+}
+
+
+
 .container-wrapper {
     position: absolute;
     width: 864px;
@@ -36,11 +58,6 @@
     background: url("images/bird-upflap.png") no-repeat;
 }
 
-.gap{
-    position: absolute;
-    background: red;
-    width: 52px;
-}
 
 .score-wrapper {
     position: absolute;
@@ -57,4 +74,40 @@
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 6px;
+    display: none;
+}
+
+
+#game-over-wrapper {
+    width: 100%;
+    height: 512px;
+    position: absolute;
+    z-index: 10;
+    background: url("images/transparentBackground.png") repeat;
+    display: none;
+}
+
+#game-over-wrapper .game-over-message {
+    position: absolute;
+    width: 500px;
+    height: 100%;
+    margin-top: 130px;
+    margin-left: 182px;
+
+    z-index: 11;
+    color: white;
+    text-align: center;
+}
+
+#game-over-wrapper .game-over-message .game-over-image{
+    width: 192px;
+    height: 42px;
+    background: url("images/gameover.png") no-repeat;
+    margin: 0 auto;
+}
+
+#game-over-wrapper .game-over-message #final-score-wrapper{
+    margin-top: 60px;
+    margin-bottom: 40px;
+    font-size: 60px;
 }

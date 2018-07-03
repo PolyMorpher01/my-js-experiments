@@ -1,5 +1,7 @@
 const $mainWrapper = document.getElementById("main-wrapper");
-
+const $homeScreen = document.getElementById("home-screen");
+const $gameOverWrapper = document.getElementById("game-over-wrapper");
+var $finalScore = document.getElementById("final-score");
 
 const CONTAINER_LEFT = 0;
 const CONTAINER_RIGHT = 864;
@@ -24,11 +26,25 @@ const GAME_LOOP_INTERVAL = 50;
 const BACKGROUND_UPDATE_SPEED = 5;
 
 
-var container = new Container({
-    $parent: $mainWrapper
-});
-container.init();
-container.startGame();
+
+var container;
+function createContainer() {
+    container = new Container({
+        $parent: $mainWrapper
+    });
+    container.init();
+}
+
+createContainer();
+
+$homeScreen.onclick = () => {
+    $homeScreen.style.display = "none";
+    container.startGame();
+};
+
+$gameOverWrapper.onclick = ()=>{
+  container.reset();
+};
 
 
 //****************Container Class Definition*******************
@@ -43,7 +59,6 @@ function Container(props) {
 
     self.init = () => {
         createContainer();
-        addScoreWrapper();
         document.onkeydown = keyDownHandler;
     };
 
@@ -55,7 +70,7 @@ function Container(props) {
         let pipePairSpawnCounter = 0;
 
         createBird();
-
+        addScoreWrapper();
         self.interval = setInterval(() => {
             updateBackgroundPosition();
 
@@ -80,6 +95,28 @@ function Container(props) {
 
         }, GAME_LOOP_INTERVAL)
 
+    };
+
+    self.reset = () => {
+        console.log(pipePairs.length);
+        var pipePairs_temp = pipePairs;
+        for (let pipePair of pipePairs_temp) {
+            pipePair.destroyPipePair();
+            pipePairs_temp[pipePairs_temp.indexOf(pipePair)] = null;
+        }
+
+        pipePairs = clearArray(pipePairs_temp);
+
+        horizontalBackgroundPosition = 0;
+        self.score = 0;
+
+        console.log(pipePairs.length);
+        self.$elem.remove();
+        $gameOverWrapper.style.display = "none";
+        self.$scoreWrapper.style.display = "none";
+        $homeScreen.style.display = "block";
+
+        createContainer();
     };
 
     const createContainer = () => {
@@ -157,6 +194,8 @@ function Container(props) {
         gameStatus = false;
         clearInterval(self.interval);
         newBird.$elem.style.background = "url(\"images/bird-dead.png\") repeat-x";
+        $gameOverWrapper.style.display = "block";
+        $finalScore.innerHTML = self.score;
         console.log("gameOver");
     };
 
@@ -174,12 +213,12 @@ function Container(props) {
                 newBird.updateBird(-1, BIRD_JUMP_SPEED);
             }
         }
-        else {
-            if (event.keyCode === 27) {
-                //ESCAPE
-                // reset();
-            }
-        }
+        // else {
+        //     if (event.keyCode === 27) {
+        //         //ESCAPE
+        //         reset();
+        //     }
+        // }
 
     };
 
@@ -190,9 +229,9 @@ function Container(props) {
         self.$elem.appendChild(self.$scoreWrapper);
 
         self.$score = document.createElement("span");
-        self.$score.style.display = "block";
         self.$scoreWrapper.appendChild(self.$score);
 
+        self.$scoreWrapper.style.display = "block";
         self.$score.innerHTML = self.score;
     };
 
@@ -336,6 +375,18 @@ function Pipe(props) {
 
 }
 
+
+//**************Function Definitions******************
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function clearArray(input) {
+    var temp = [];
+    for (let value of input) {
+        if (value !== null) {
+            (temp).push(value);
+        }
+    }
+    return temp;
 }
