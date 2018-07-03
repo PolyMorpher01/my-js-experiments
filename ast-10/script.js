@@ -26,384 +26,359 @@ const BACKGROUND_UPDATE_SPEED = 5;
 //************Global Variable Declaration Ends here*******************
 
 
-//create New Game
-var newGame = new Game({
-    $homeScreen: $homeScreen,
-    $gameOverWrapper: $gameOverWrapper,
-    $parent: $mainWrapper
-});
+//****************Pipe Class Definition****************
+class Pipe {
 
-newGame.init();
-
-
-//*************Game Class Definition*******************
-function Game(props) {
-    var self = this;
-
-    self.$homeScreen = props.$homeScreen;
-    self.$gameOverWrapper = props.$gameOverWrapper;
-    self.$parent = props.$parent;
-
-
-    self.init = function () {
-        createContainer();
-        addClickEvents();
-    };
-
-
-    var container;
-
-    function createContainer() {
-        container = new Container({
-            $homeScreen: self.$homeScreen,
-            $gameOverWrapper: self.$gameOverWrapper,
-            $parent: self.$parent,
-        });
-        container.init();
+    constructor(x, y, $parent, type = "down") {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.$parent = $parent;
     }
 
 
-    const addClickEvents = () => {
-        self.$homeScreen.onclick = () => {
-            self.$homeScreen.style.display = "none";
-            container.startGame();
-        };
+    init() {
+        this.addPipe();
+        this.plotPosition();
+    }
 
-        self.$gameOverWrapper.onclick = () => {
-            container.reset();
-        };
+    addPipe() {
+        this.$elem = document.createElement("div");
+        this.$elem.className = "pipe";
+        if (this.type === "top") this.$elem.style.transform = "rotate(180deg)";
+        this.$parent.appendChild(this.$elem);
+
+        this.plotPosition();
+    }
+
+    updatePipe() {
+        this.x = this.x - BACKGROUND_UPDATE_SPEED;
+        this.plotPosition();
+        return this.x;
+    }
+
+    destroyPipe() {
+        this.$elem.remove();
+    }
+
+    plotPosition() {
+        this.$elem.style.left = this.x + "px";
+        this.$elem.style.top = this.y + "px";
     };
 
 }
 
+//****************PipePair Class Definition****************
 
-//****************Container Class Definition*******************
-function Container(props) {
-    var self = this;
-
-    self.$homeScreen = props.$homeScreen;
-    self.$gameOverWrapper = props.$gameOverWrapper;
-    self.$parent = props.$parent;
-    self.score = 0;
-
-    var pipePairs = [];
-    var gameStatus = false;
-
-    self.init = () => {
-        createContainer();
-        document.onkeydown = keyDownHandler;
-    };
-
-    var animate;
+class PipePair {
 
 
-    self.startGame = () => {
-        gameStatus = true;
-
-        let pipeInitialLeftPosition = CONTAINER_RIGHT;
-        let pipePairSpawnCounter = 0;
-
-        createBird();
-        addScoreWrapper();
-
-        const FPS = 60;
-        self.gameLoop = () => {
-
-            setTimeout(function () { //throttle speed of animation
-                animate = window.requestAnimationFrame(self.gameLoop);
-
-                updateBackgroundPosition();
-
-                pipePairSpawnCounter++;
-                if (pipePairSpawnCounter > PIPE_SPAWN_DELAY) {
-                    pipeInitialLeftPosition += PIPE_SPAWN_GAP;
-                    pipePairs.push(createPipes(pipeInitialLeftPosition));
-                    pipePairSpawnCounter = 0;
-                }
-
-                if (pipePairs.length) {
-                    updatePipePairs();
-                }
-
-                if (pipePairs.length) {
-                    if (checkCollision()) {
-                        gameOver();
-                    }
-                }
-
-                updateBird();
-
-            }, 1000 / FPS);
+    constructor(x, $parent) {
+        this.x = x;
+        this.$parent = $parent;
+        this.topY = getRandom(-200, 0);
+        this.bottomY = PIPE_SPACE + this.topY;
+    }
 
 
-        };
+    init() {
+        this.createPipePair();
+    }
 
 
-        animate = window.requestAnimationFrame(self.gameLoop);
+    createPipePair() {
+        this.pipeTop = new Pipe(this.x, this.topY, this.$parent, "top");
+        this.pipeTop.init();
 
-    };
-
-    self.reset = () => {
-        var pipePairs_temp = pipePairs;
-        for (let pipePair of pipePairs_temp) {
-            pipePair.destroyPipePair();
-            pipePairs_temp[pipePairs_temp.indexOf(pipePair)] = null;
-        }
-
-        pipePairs = clearArray(pipePairs_temp);
-
-        horizontalBackgroundPosition = 0;
-        self.score = 0;
-        self.$elem.remove();
-        self.$gameOverWrapper.style.display = "none";
-        self.$scoreWrapper.style.display = "none";
-        self.$homeScreen.style.display = "block";
-
-        createContainer();
-    };
-
-    const createContainer = () => {
-        self.$elem = document.createElement("div");
-        self.$elem.className = "container-wrapper";
-        self.$parent.appendChild(self.$elem);
-    };
-
-    const createPipes = (x) => {
-        let pipePair = new PipePair({
-            x: x,
-            $parent: self.$elem
-        });
-        pipePair.init();
-        return pipePair;
-    };
-
-    const updatePipePairs = () => {
-        for (let pipe of pipePairs) {
-            pipe.updatePipePair();
-
-            if (pipe.x < CONTAINER_LEFT - PIPE_WIDTH) {
-                pipe.destroyPipePair();
-                pipePairs.shift();
-            }
-
-        }
-    };
-
-    var newBird;
-    const createBird = () => {
-        newBird = new Bird({
-            x: BIRD_LEFT_POSITION,
-            y: BIRD_INITIAL_TOP_POSITION,
-            dy: 1,
-            $parent: self.$elem
-        });
-        newBird.init();
-    };
-
-    const updateBird = () => {
-        newBird.updateBird(1, BIRD_FALL_SPEED);
-
-        // newBird.$elem.style.transform = "rotate(25deg)";
-
-        if (newBird.y > CONTAINER_BOTTOM - BIRD_HEIGHT || newBird.y < CONTAINER_TOP + BIRD_HEIGHT) {
-            gameOver();
-        }
+        this.pipeBottom = new Pipe(this.x, this.bottomY, this.$parent, "down");
+        this.pipeBottom.init();
+    }
 
 
-    };
+    updatePipePair() {
+        this.x = this.pipeTop.updatePipe();
+        this.pipeBottom.updatePipe();
+    }
 
-    const checkCollision = () => {
-        if (newBird.x + BIRD_WIDTH > pipePairs[0].x && newBird.x < pipePairs[0].x + PIPE_WIDTH) {
 
-            if (newBird.y < pipePairs[0].topY + PIPE_HEIGHT ||
-                newBird.y + BIRD_HEIGHT > pipePairs[0].bottomY) {
-                return true;
-            }
-
-            else {
-                let OFFSET = 2;
-                if (newBird.x > pipePairs[0].x + PIPE_WIDTH - OFFSET) {
-                    updateScore();
-                }
-            }
-        }
-
-    };
-
-    const addScoreWrapper = function () {
-        self.$scoreWrapper = document.createElement("div");
-        self.$scoreWrapper.className = "score-wrapper";
-        self.$elem.appendChild(self.$scoreWrapper);
-
-        self.$score = document.createElement("span");
-        self.$scoreWrapper.appendChild(self.$score);
-
-        self.$scoreWrapper.style.display = "block";
-        self.$score.innerHTML = self.score;
-    };
-
-    const updateScore = () => {
-        self.score++;
-        self.$score.innerHTML = self.score;
-    };
-
-    const gameOver = () => {
-        gameStatus = false;
-        window.cancelAnimationFrame(animate);
-        newBird.$elem.style.background = "url(\"images/bird-dead.png\")";
-        self.$gameOverWrapper.style.display = "block";
-        $finalScore.innerHTML = self.score;
-    };
-
-    var horizontalBackgroundPosition = 0;
-    const updateBackgroundPosition = () => {
-        horizontalBackgroundPosition += BACKGROUND_UPDATE_SPEED;
-        self.$elem.style.backgroundPosition = "-" + horizontalBackgroundPosition + "px" + " 0";
-    };
-
-    const keyDownHandler = function (event) {
-        if (gameStatus === true) {
-            if (event.keyCode === 32) {
-                //SPACE_BAR
-                // newBird.$elem.style.transform = "rotate(-25deg)";
-                newBird.updateBird(-1, BIRD_JUMP_SPEED);
-            }
-        }
-    };
-
+    destroyPipePair() {
+        this.pipeTop.destroyPipe();
+        this.pipeBottom.destroyPipe();
+    }
 
 }
 
 
 //**************Bird Class Definition*****************
-function Bird(props) {
-    var self = this;
+class Bird {
 
-    self.x = props.x;
-    self.y = props.y;
-    self.dy = props.dy;
+    constructor(x, y, dy, $parent) {
+        this.x = x;
+        this.y = y;
+        this.dy = dy;
+        this.$parent = $parent;
+    }
 
-    self.$parent = props.$parent;
 
-
-    self.init = () => {
-        createBird();
-        plotPosition();
+    init() {
+        this.createBird();
+        this.plotPosition();
     };
 
-    const createBird = () => {
-        self.$elem = document.createElement("div");
-        self.$elem.className = "bird";
-        self.$parent.appendChild(self.$elem);
-    };
-
-    const plotPosition = () => {
-        self.$elem.style.left = self.x + "px";
-        self.$elem.style.top = self.y + "px";
-    };
-
-    self.updateBird = (dy, speed) => {
-        self.y = self.y + dy * speed;
-        plotPosition();
-    };
-
-    self.destroyBird = () => {
-        self.$elem.remove();
-    };
-
-}
+    createBird() {
+        this.$elem = document.createElement("div");
+        this.$elem.className = "bird";
+        this.$parent.appendChild(this.$elem);
+    }
 
 
-//****************PipePair Class Definition****************
-
-function PipePair(props) {
-
-    var self = this;
-
-
-    self.x = props.x;
-    self.$parent = props.$parent;
-
-    self.topY = getRandom(-200, 0);
-    self.bottomY = PIPE_SPACE + self.topY;
-
-    self.init = () => {
-        createPipePair();
-    };
+    plotPosition() {
+        this.$elem.style.left = this.x + "px";
+        this.$elem.style.top = this.y + "px";
+    }
 
 
-    var pipeTop;
-    var pipeBottom;
-    const createPipePair = () => {
-        pipeTop = new Pipe({
-            x: self.x,
-            y: self.topY,
-            $parent: self.$parent,
-            type: "top"
-        });
-        pipeTop.init();
+    updateBird(dy = 1, speed) {
+        this.y = this.y + dy * speed;
+        this.plotPosition();
+    }
 
-        pipeBottom = new Pipe({
-            x: self.x,
-            y: self.bottomY,
-            $parent: self.$parent,
-            type: "down"
-        });
-        pipeBottom.init();
-    };
-
-
-    self.updatePipePair = () => {
-        self.x = pipeTop.updatePipe();
-        self.leftOfGap = self.x;
-        pipeBottom.updatePipe();
-    };
-
-
-    self.destroyPipePair = () => {
-        pipeTop.destroyPipe();
-        pipeBottom.destroyPipe();
+    destroyBird() {
+        this.$elem.remove();
     }
 
 }
 
 
-//****************Pipe Class Definition****************
-function Pipe(props) {
-    var self = this;
+//****************Container Class Definition*******************
+class Container {
 
-    self.x = props.x;
-    self.y = props.y;
-    self.type = props.type || "down";
-    self.$parent = props.$parent;
 
-    self.init = () => {
-        addPipe();
-        plotPosition();
+    constructor($homeScreen, $gameOverWrapper, $parent) {
+
+        this.$homeScreen = $homeScreen;
+        this.$gameOverWrapper = $gameOverWrapper;
+        this.$parent = $parent;
+        this.score = 0;
+        this.pipePairs = [];
+        this.gameStatus = false;
+        this.horizontalBackgroundPosition = 0;
+    }
+
+    init() {
+        this.createContainer();
+        document.onkeydown = this.keyDownHandler.bind(this);
     };
 
-    const addPipe = () => {
-        self.$elem = document.createElement("div");
-        self.$elem.className = "pipe";
-        if (self.type === "top") self.$elem.style.transform = "rotate(180deg)";
-        self.$parent.appendChild(self.$elem);
 
-        plotPosition();
+    startGame() {
+        this.gameStatus = true;
+
+        let pipeInitialLeftPosition = CONTAINER_RIGHT;
+        let pipePairSpawnCounter = 0;
+
+        this.createBird();
+        this.addScoreWrapper();
+
+        const FPS = 30;
+
+        this.gameLoop = () => {
+            setTimeout(() => { //throttle speed of animation
+
+                this.animate = window.requestAnimationFrame(this.gameLoop);
+
+                this.updateBackgroundPosition();
+
+                pipePairSpawnCounter++;
+                if (pipePairSpawnCounter > PIPE_SPAWN_DELAY) {
+                    pipeInitialLeftPosition += PIPE_SPAWN_GAP;
+                    this.pipePairs.push(this.createPipes(pipeInitialLeftPosition));
+                    pipePairSpawnCounter = 0;
+                }
+
+                if (this.pipePairs.length) {
+                    this.updatePipePairs();
+                }
+
+                if (this.pipePairs.length) {
+                    if (this.checkCollision()) {
+                        this.gameOver();
+                    }
+                }
+
+                this.updateBird();
+
+            }, 1000 / FPS);
+
+        };
+
+
+        window.requestAnimationFrame(this.gameLoop);
+
     };
 
-    self.updatePipe = () => {
-        self.x = self.x - BACKGROUND_UPDATE_SPEED;
-        plotPosition();
-        return self.x;
-    };
 
-    self.destroyPipe = () => {
-        self.$elem.remove();
-    };
+    reset() {
+        let pipePairs_temp = this.pipePairs;
+        for (let pipePair of pipePairs_temp) {
+            pipePair.destroyPipePair();
+            pipePairs_temp[pipePairs_temp.indexOf(pipePair)] = null;
+        }
 
-    const plotPosition = () => {
-        self.$elem.style.left = self.x + "px";
-        self.$elem.style.top = self.y + "px";
+        this.pipePairs = clearArray(pipePairs_temp);
+
+        this.horizontalBackgroundPosition = 0;
+        this.score = 0;
+        this.$elem.remove();
+        this.newBird.destroyBird();
+        this.$gameOverWrapper.style.display = "none";
+        this.$scoreWrapper.style.display = "none";
+        this.$homeScreen.style.display = "block";
+
+        this.createContainer();
+    }
+
+
+    createContainer() {
+        this.$elem = document.createElement("div");
+        this.$elem.className = "container-wrapper";
+        this.$parent.appendChild(this.$elem);
+    }
+
+    createPipes(x) {
+        let pipePair = new PipePair(x, this.$elem);
+        pipePair.init();
+        return pipePair;
+    }
+
+
+    updatePipePairs() {
+        for (let pipe of this.pipePairs) {
+            pipe.updatePipePair();
+
+            if (pipe.x < CONTAINER_LEFT - PIPE_WIDTH) {
+                pipe.destroyPipePair();
+                this.pipePairs.shift();
+            }
+
+        }
+    }
+
+
+    createBird() {
+        this.newBird = new Bird(BIRD_LEFT_POSITION, BIRD_INITIAL_TOP_POSITION, 1, this.$elem);
+        this.newBird.init();
+    }
+
+
+    updateBird() {
+        this.newBird.updateBird(1, BIRD_FALL_SPEED);
+
+        // this.newBird.$elem.style.transform = "rotate(25deg)";
+
+        if (this.newBird.y > CONTAINER_BOTTOM - BIRD_HEIGHT || this.newBird.y < CONTAINER_TOP + BIRD_HEIGHT) {
+            this.gameOver();
+        }
+
+
+    }
+
+
+    checkCollision() {
+        if (this.newBird.x + BIRD_WIDTH > this.pipePairs[0].x && this.newBird.x < this.pipePairs[0].x + PIPE_WIDTH) {
+
+            if (this.newBird.y < this.pipePairs[0].topY + PIPE_HEIGHT ||
+                this.newBird.y + BIRD_HEIGHT > this.pipePairs[0].bottomY) {
+                return true;
+            }
+
+            else {
+                let OFFSET = 2;
+                if (this.newBird.x > this.pipePairs[0].x + PIPE_WIDTH - OFFSET) {
+                    this.updateScore();
+                }
+            }
+        }
+
+    }
+
+
+    addScoreWrapper() {
+        this.$scoreWrapper = document.createElement("div");
+        this.$scoreWrapper.className = "score-wrapper";
+        this.$elem.appendChild(this.$scoreWrapper);
+
+        this.$score = document.createElement("span");
+        this.$scoreWrapper.appendChild(this.$score);
+
+        this.$scoreWrapper.style.display = "block";
+        this.$score.innerHTML = this.score;
+    }
+
+
+    updateScore() {
+        this.score++;
+        this.$score.innerHTML = this.score;
+    }
+
+
+    gameOver() {
+        this.gameStatus = false;
+        window.cancelAnimationFrame(this.animate);
+        this.newBird.$elem.style.background = "url(\"images/bird-dead.png\")";
+        this.$gameOverWrapper.style.display = "block";
+        $finalScore.innerHTML = this.score;
+    }
+
+
+    updateBackgroundPosition() {
+        this.horizontalBackgroundPosition += BACKGROUND_UPDATE_SPEED;
+        this.$elem.style.backgroundPosition = "-" + this.horizontalBackgroundPosition + "px" + " 0";
+    }
+
+    keyDownHandler(event) {
+        if (this.gameStatus === true) {
+            if (event.keyCode === 32) {
+                //SPACE_BAR
+                console.log(event.keyCode);
+                // this.newBird.$elem.style.transform = "rotate(-25deg)";
+                this.newBird.updateBird(-1, BIRD_JUMP_SPEED);
+            }
+        }
+    }
+
+}
+
+//*************Game Class Definition*******************
+class Game {
+
+    constructor($homeScreen, $gameOverWrapper, $parent) {
+        this.$homeScreen = $homeScreen;
+        this.$gameOverWrapper = $gameOverWrapper;
+        this.$parent = $parent;
+    }
+
+
+    init() {
+        this.createContainer();
+        this.addClickEvents();
+    }
+
+    createContainer() {
+        this.container = new Container(this.$homeScreen, this.$gameOverWrapper, this.$parent);
+        this.container.init();
+    }
+
+
+    addClickEvents() {
+        this.$homeScreen.onclick = () => {
+            this.$homeScreen.style.display = "none";
+            this.container.startGame();
+        };
+
+        this.$gameOverWrapper.onclick = () => {
+            this.container.reset();
+        };
     };
 
 }
@@ -415,7 +390,7 @@ function getRandom(min, max) {
 }
 
 function clearArray(input) {
-    var temp = [];
+    let temp = [];
     for (let value of input) {
         if (value !== null) {
             (temp).push(value);
@@ -423,3 +398,8 @@ function clearArray(input) {
     }
     return temp;
 }
+
+//create New Game
+const newGame = new Game($homeScreen, $gameOverWrapper, $mainWrapper);
+
+newGame.init();
