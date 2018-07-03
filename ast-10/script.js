@@ -1,7 +1,7 @@
 const $mainWrapper = document.getElementById("main-wrapper");
 const $homeScreen = document.getElementById("home-screen");
 const $gameOverWrapper = document.getElementById("game-over-wrapper");
-var $finalScore = document.getElementById("final-score");
+const $finalScore = document.getElementById("final-score");
 
 const CONTAINER_LEFT = 0;
 const CONTAINER_RIGHT = 864;
@@ -21,36 +21,68 @@ const PIPE_SPAWN_GAP = 60;
 const PIPE_SPAWN_DELAY = 80;
 const PIPE_HEIGHT = 320;
 
-
 const GAME_LOOP_INTERVAL = 50;
 const BACKGROUND_UPDATE_SPEED = 5;
+//************Global Variable Declaration Ends here*******************
 
 
+//create New Game
+var newGame = new Game({
+    $homeScreen: $homeScreen,
+    $gameOverWrapper: $gameOverWrapper,
+    $parent: $mainWrapper
+});
 
-var container;
-function createContainer() {
-    container = new Container({
-        $parent: $mainWrapper
-    });
-    container.init();
+newGame.init();
+
+
+//*************Game Class Definition*******************
+function Game(props) {
+    var self = this;
+
+    self.$homeScreen = props.$homeScreen;
+    self.$gameOverWrapper = props.$gameOverWrapper;
+    self.$parent = props.$parent;
+
+
+    self.init = function () {
+        createContainer();
+        addClickEvents();
+    };
+
+
+    var container;
+
+    function createContainer() {
+        container = new Container({
+            $homeScreen: self.$homeScreen,
+            $gameOverWrapper: self.$gameOverWrapper,
+            $parent: self.$parent,
+        });
+        container.init();
+    }
+
+
+    const addClickEvents = () => {
+        self.$homeScreen.onclick = () => {
+            self.$homeScreen.style.display = "none";
+            container.startGame();
+        };
+
+        self.$gameOverWrapper.onclick = () => {
+            container.reset();
+        };
+    };
+
 }
-
-createContainer();
-
-$homeScreen.onclick = () => {
-    $homeScreen.style.display = "none";
-    container.startGame();
-};
-
-$gameOverWrapper.onclick = ()=>{
-  container.reset();
-};
 
 
 //****************Container Class Definition*******************
 function Container(props) {
     var self = this;
 
+    self.$homeScreen = props.$homeScreen;
+    self.$gameOverWrapper = props.$gameOverWrapper;
     self.$parent = props.$parent;
     self.score = 0;
 
@@ -98,7 +130,6 @@ function Container(props) {
     };
 
     self.reset = () => {
-        console.log(pipePairs.length);
         var pipePairs_temp = pipePairs;
         for (let pipePair of pipePairs_temp) {
             pipePair.destroyPipePair();
@@ -110,11 +141,10 @@ function Container(props) {
         horizontalBackgroundPosition = 0;
         self.score = 0;
 
-        console.log(pipePairs.length);
         self.$elem.remove();
-        $gameOverWrapper.style.display = "none";
+        self.$gameOverWrapper.style.display = "none";
         self.$scoreWrapper.style.display = "none";
-        $homeScreen.style.display = "block";
+        self.$homeScreen.style.display = "block";
 
         createContainer();
     };
@@ -169,13 +199,11 @@ function Container(props) {
 
     };
 
-
     const checkCollision = () => {
         if (newBird.x + BIRD_WIDTH > pipePairs[0].x && newBird.x < pipePairs[0].x + PIPE_WIDTH) {
 
             if (newBird.y < pipePairs[0].topY + PIPE_HEIGHT ||
                 newBird.y + BIRD_HEIGHT > pipePairs[0].bottomY) {
-                console.log("collide");
                 return true;
             }
 
@@ -189,14 +217,29 @@ function Container(props) {
 
     };
 
+    const addScoreWrapper = function () {
+        self.$scoreWrapper = document.createElement("div");
+        self.$scoreWrapper.className = "score-wrapper";
+        self.$elem.appendChild(self.$scoreWrapper);
+
+        self.$score = document.createElement("span");
+        self.$scoreWrapper.appendChild(self.$score);
+
+        self.$scoreWrapper.style.display = "block";
+        self.$score.innerHTML = self.score;
+    };
+
+    const updateScore = () => {
+        self.score++;
+        self.$score.innerHTML = self.score;
+    };
 
     const gameOver = () => {
         gameStatus = false;
         clearInterval(self.interval);
         newBird.$elem.style.background = "url(\"images/bird-dead.png\") repeat-x";
-        $gameOverWrapper.style.display = "block";
+        self.$gameOverWrapper.style.display = "block";
         $finalScore.innerHTML = self.score;
-        console.log("gameOver");
     };
 
     var horizontalBackgroundPosition = 0;
@@ -205,7 +248,7 @@ function Container(props) {
         self.$elem.style.backgroundPosition = "-" + horizontalBackgroundPosition + "px" + " 0";
     };
 
-    var keyDownHandler = function (event) {
+    const keyDownHandler = function (event) {
         if (gameStatus === true) {
             if (event.keyCode === 32) {
                 //SPACE_BAR
@@ -223,22 +266,7 @@ function Container(props) {
     };
 
 
-    var addScoreWrapper = function () {
-        self.$scoreWrapper = document.createElement("div");
-        self.$scoreWrapper.className = "score-wrapper";
-        self.$elem.appendChild(self.$scoreWrapper);
 
-        self.$score = document.createElement("span");
-        self.$scoreWrapper.appendChild(self.$score);
-
-        self.$scoreWrapper.style.display = "block";
-        self.$score.innerHTML = self.score;
-    };
-
-    const updateScore = () => {
-        self.score++;
-        self.$score.innerHTML = self.score;
-    };
 }
 
 
