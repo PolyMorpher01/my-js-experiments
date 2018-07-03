@@ -130,7 +130,6 @@
     left: 0;
     top: 0;
     width: 60px;
-    padding-left: 10px;
     font-size: 20px;
     background-color: white;
     color: mediumpurple;
@@ -138,6 +137,7 @@
     opacity: 0.6;
     margin: 6px 0 0 10px;
     text-align: right;
+    padding-left: 10px;
     padding-right: 10px;
     border-radius: 6px;
 }
