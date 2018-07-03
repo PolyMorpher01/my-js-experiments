@@ -65,16 +65,10 @@
     left: 0;
     top: 0;
     width: 100px;
-    font-size: 40px;
-    background-color: white;
-    color: skyblue;
+    height: 36px;
     z-index: 4;
     opacity: 0.6;
-    margin: 6px 0 0 10px;
-    text-align: right;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 6px;
+    margin: 20px 0 0 20px;
     display: none;
 }
 
@@ -92,7 +86,7 @@
     position: absolute;
     width: 500px;
     height: 100%;
-    margin-top: 130px;
+    margin-top: 100px;
     margin-left: 182px;
 
     z-index: 11;
@@ -104,11 +98,21 @@
     width: 192px;
     height: 42px;
     background: url("images/gameover.png") no-repeat;
+    background-repeat: no-repeat;
     margin: 0 auto;
 }
 
 #game-over-wrapper .game-over-message #final-score-wrapper{
-    margin-top: 60px;
-    margin-bottom: 40px;
-    font-size: 60px;
+    margin-top: 80px;
+    margin-bottom: 80px;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+
+#final-score-wrapper #final-score{
+    width: 100px;
+    height: 36px;
+    margin: 0 auto;
+    margin-top: 20px;
 }

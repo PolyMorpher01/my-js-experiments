@@ -308,17 +308,36 @@ class Container {
         this.$scoreWrapper.className = "score-wrapper";
         this.$elem.appendChild(this.$scoreWrapper);
 
-        this.$score = document.createElement("span");
-        this.$scoreWrapper.appendChild(this.$score);
-
         this.$scoreWrapper.style.display = "block";
-        this.$score.innerHTML = this.score;
+        this.scoreBackground = "url(\"images/0.png\") no-repeat";
+        this.$scoreWrapper.style.background =  this.scoreBackground;
     }
 
 
     updateScore() {
         this.score++;
-        this.$score.innerHTML = this.score;
+
+        //split numbers
+        let digits = [];
+        let tempScore = this.score;
+        while (tempScore > 0) {
+            digits.push(tempScore % 10);
+            tempScore = Math.floor(tempScore / 10);
+        }
+
+        this.scoreBackground = '';
+        const SCORE_SPACE = 25;
+        let scoreLeft = 0;
+        for (let i = digits.length - 1; i >= 0; i--) {
+            this.scoreBackground += "url(\"images/" + digits[i] + ".png\") no-repeat " + scoreLeft+"px"+ " 0";
+            if (i !== 0) {
+                scoreLeft += SCORE_SPACE;
+                this.scoreBackground += ",";
+            }
+        }
+
+        this.$scoreWrapper.style.background =  this.scoreBackground ;
+
     }
 
 
@@ -327,7 +346,7 @@ class Container {
         window.cancelAnimationFrame(this.animate);
         this.newBird.$elem.style.background = "url(\"images/bird-dead.png\")";
         this.$gameOverWrapper.style.display = "block";
-        $finalScore.innerHTML = this.score;
+        $finalScore.style.background =  this.scoreBackground;
     }
 
 
@@ -340,7 +359,6 @@ class Container {
         if (this.gameStatus === true) {
             if (event.keyCode === 32) {
                 //SPACE_BAR
-                console.log(event.keyCode);
                 // this.newBird.$elem.style.transform = "rotate(-25deg)";
                 this.newBird.updateBird(-1, BIRD_JUMP_SPEED);
             }
@@ -398,6 +416,7 @@ function clearArray(input) {
     }
     return temp;
 }
+
 
 //create New Game
 const newGame = new Game($homeScreen, $gameOverWrapper, $mainWrapper);
