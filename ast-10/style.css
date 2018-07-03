@@ -1,11 +1,19 @@
+* {
+    font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
 #main-wrapper {
     position: relative;
     margin: 0 auto;
     width: 864px;
 }
 
-
-.container-wrapper{
+.container-wrapper {
     position: absolute;
     width: 864px;
     height: 512px;
@@ -14,10 +22,39 @@
     overflow: hidden;
 }
 
-.pipe{
+.pipe {
     position: absolute;
     width: 52px;
     height: 320px;
     background: url("images/pipe-green.png") no-repeat;
 }
 
+.bird {
+    position: absolute;
+    width: 34px;
+    height: 24px;
+    background: url("images/bird-upflap.png") no-repeat;
+}
+
+.gap{
+    position: absolute;
+    background: red;
+    width: 52px;
+}
+
+.score-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+    font-size: 40px;
+    background-color: white;
+    color: mediumpurple;
+    z-index: 4;
+    opacity: 0.6;
+    margin: 6px 0 0 10px;
+    text-align: right;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 6px;
+}

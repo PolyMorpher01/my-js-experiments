@@ -3,15 +3,25 @@ const $mainWrapper = document.getElementById("main-wrapper");
 
 const CONTAINER_LEFT = 0;
 const CONTAINER_RIGHT = 864;
+const CONTAINER_BOTTOM = 512;
+const CONTAINER_TOP = 0;
+
 const BIRD_HEIGHT = 24;
 const BIRD_WIDTH = 34;
-const PIPE_WIDTH = 52;
-const PIPE_GAP = 400 + BIRD_HEIGHT * 2;
-const PIPE_SPAWN_GAP = 50;
+const BIRD_LEFT_POSITION = 150;
+const BIRD_INITIAL_TOP_POSITION = 100;
+const BIRD_JUMP_SPEED = 40;
+const BIRD_FALL_SPEED = 6;
 
-var GAME_LOOP_INTERVAL = 100;
-var BACKGROUND_UPDATE_SPEED = 4;
-var PIPE_SPAWN_DELAY = 50;
+const PIPE_WIDTH = 52;
+const PIPE_SPACE = 400 + BIRD_HEIGHT;
+const PIPE_SPAWN_GAP = 60;
+const PIPE_SPAWN_DELAY = 80;
+const PIPE_HEIGHT = 320;
+
+
+const GAME_LOOP_INTERVAL = 50;
+const BACKGROUND_UPDATE_SPEED = 5;
 
 
 var container = new Container({
@@ -20,38 +30,53 @@ var container = new Container({
 container.init();
 container.startGame();
 
+
+//****************Container Class Definition*******************
 function Container(props) {
     var self = this;
 
     self.$parent = props.$parent;
+    self.score = 0;
 
     var pipePairs = [];
+    var gameStatus = false;
 
     self.init = () => {
         createContainer();
+        addScoreWrapper();
+        document.onkeydown = keyDownHandler;
     };
 
 
     self.startGame = () => {
-        let pipeLeftPosition = CONTAINER_RIGHT;
+        gameStatus = true;
+
+        let pipeInitialLeftPosition = CONTAINER_RIGHT;
         let pipePairSpawnCounter = 0;
+
+        createBird();
 
         self.interval = setInterval(() => {
             updateBackgroundPosition();
 
-            console.log(pipePairs.length);
-
-
             pipePairSpawnCounter++;
             if (pipePairSpawnCounter > PIPE_SPAWN_DELAY) {
-                pipeLeftPosition += PIPE_SPAWN_GAP;
-                pipePairs.push(createPipes(pipeLeftPosition));
+                pipeInitialLeftPosition += PIPE_SPAWN_GAP;
+                pipePairs.push(createPipes(pipeInitialLeftPosition));
                 pipePairSpawnCounter = 0;
             }
 
             if (pipePairs.length) {
                 updatePipePairs();
             }
+
+            if (pipePairs.length) {
+                if (checkCollision()) {
+                    gameOver();
+                }
+            }
+            updateBird();
+
 
         }, GAME_LOOP_INTERVAL)
 
@@ -76,19 +101,144 @@ function Container(props) {
         for (let pipe of pipePairs) {
             pipe.updatePipePair();
 
-            if(pipe.x < CONTAINER_LEFT){
+            if (pipe.x < CONTAINER_LEFT - PIPE_WIDTH) {
                 pipe.destroyPipePair();
-                pipePairs.splice(pipePairs.indexOf(pipe),1);
+                pipePairs.splice(pipePairs.indexOf(pipe), 1);
             }
 
         }
     };
 
-    var verticalBackgroundPosition = 0;
+    var newBird;
+    const createBird = () => {
+        newBird = new Bird({
+            x: BIRD_LEFT_POSITION,
+            y: BIRD_INITIAL_TOP_POSITION,
+            dy: 1,
+            $parent: self.$elem
+        });
+        newBird.init();
+    };
+
+    const updateBird = () => {
+        newBird.updateBird(1, BIRD_FALL_SPEED);
+
+        // newBird.$elem.style.transform = "rotate(25deg)";
+
+        if (newBird.y > CONTAINER_BOTTOM - BIRD_HEIGHT || newBird.y < CONTAINER_TOP + BIRD_HEIGHT) {
+            gameOver();
+        }
+
+
+    };
+
+
+    const checkCollision = () => {
+        if (newBird.x + BIRD_WIDTH > pipePairs[0].x && newBird.x < pipePairs[0].x + PIPE_WIDTH) {
+
+            if (newBird.y < pipePairs[0].topY + PIPE_HEIGHT ||
+                newBird.y + BIRD_HEIGHT > pipePairs[0].bottomY) {
+                console.log("collide");
+                return true;
+            }
+
+            else {
+                let OFFSET = 2;
+                if (newBird.x > pipePairs[0].x + PIPE_WIDTH - OFFSET) {
+                    updateScore();
+                }
+            }
+        }
+
+    };
+
+
+    const gameOver = () => {
+        gameStatus = false;
+        clearInterval(self.interval);
+        newBird.$elem.style.background = "url(\"images/bird-dead.png\") repeat-x";
+        console.log("gameOver");
+    };
+
+    var horizontalBackgroundPosition = 0;
     const updateBackgroundPosition = () => {
-        verticalBackgroundPosition += BACKGROUND_UPDATE_SPEED;
-        self.$elem.style.backgroundPosition = "-" + verticalBackgroundPosition + "px" + " 0";
-    }
+        horizontalBackgroundPosition += BACKGROUND_UPDATE_SPEED;
+        self.$elem.style.backgroundPosition = "-" + horizontalBackgroundPosition + "px" + " 0";
+    };
+
+    var keyDownHandler = function (event) {
+        if (gameStatus === true) {
+            if (event.keyCode === 32) {
+                //SPACE_BAR
+                // newBird.$elem.style.transform = "rotate(-25deg)";
+                newBird.updateBird(-1, BIRD_JUMP_SPEED);
+            }
+        }
+        else {
+            if (event.keyCode === 27) {
+                //ESCAPE
+                // reset();
+            }
+        }
+
+    };
+
+
+    var addScoreWrapper = function () {
+        self.$scoreWrapper = document.createElement("div");
+        self.$scoreWrapper.className = "score-wrapper";
+        self.$elem.appendChild(self.$scoreWrapper);
+
+        self.$score = document.createElement("span");
+        self.$score.style.display = "block";
+        self.$scoreWrapper.appendChild(self.$score);
+
+        self.$score.innerHTML = self.score;
+    };
+
+    const updateScore = () => {
+        self.score++;
+        self.$score.innerHTML = self.score;
+    };
+}
+
+
+//**************Bird Class Definition*****************
+function Bird(props) {
+    var self = this;
+
+    self.x = props.x;
+    self.y = props.y;
+    self.dy = props.dy;
+
+    self.$parent = props.$parent;
+
+
+    self.init = () => {
+        createBird();
+        plotPosition();
+    };
+
+    const createBird = () => {
+        self.$elem = document.createElement("div");
+        self.$elem.className = "bird";
+        self.$parent.appendChild(self.$elem);
+    };
+
+    const plotPosition = () => {
+        self.$elem.style.left = self.x + "px";
+        self.$elem.style.top = self.y + "px";
+    };
+
+    self.updateBird = (dy, speed) => {
+        self.y = self.y + dy * speed;
+        plotPosition();
+    };
+
+    self.destroyBird = () => {
+        self.$elem.remove();
+    };
+
 }
 
 
@@ -103,8 +253,7 @@ function PipePair(props) {
     self.$parent = props.$parent;
 
     self.topY = getRandom(-200, 0);
-    self.bottomY = PIPE_GAP + self.topY;
-
+    self.bottomY = PIPE_SPACE + self.topY;
 
     self.init = () => {
         createPipePair();
@@ -134,6 +283,7 @@ function PipePair(props) {
 
     self.updatePipePair = () => {
         self.x = pipeTop.updatePipe();
+        self.leftOfGap = self.x;
         pipeBottom.updatePipe();
     };
 
@@ -169,7 +319,7 @@ function Pipe(props) {
         plotPosition();
     };
 
-    self.updatePipe = (x) => {
+    self.updatePipe = () => {
         self.x = self.x - BACKGROUND_UPDATE_SPEED;
         plotPosition();
         return self.x;
@@ -179,7 +329,7 @@ function Pipe(props) {
         self.$elem.remove();
     };
 
-    const plotPosition = (x) => {
+    const plotPosition = () => {
         self.$elem.style.left = self.x + "px";
         self.$elem.style.top = self.y + "px";
     };
