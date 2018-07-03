@@ -94,6 +94,8 @@ function Container(props) {
         document.onkeydown = keyDownHandler;
     };
 
+    var animate;
+
 
     self.startGame = () => {
         gameStatus = true;
@@ -103,29 +105,41 @@ function Container(props) {
 
         createBird();
         addScoreWrapper();
-        self.interval = setInterval(() => {
-            updateBackgroundPosition();
 
-            pipePairSpawnCounter++;
-            if (pipePairSpawnCounter > PIPE_SPAWN_DELAY) {
-                pipeInitialLeftPosition += PIPE_SPAWN_GAP;
-                pipePairs.push(createPipes(pipeInitialLeftPosition));
-                pipePairSpawnCounter = 0;
-            }
+        const FPS = 60;
+        self.gameLoop = () => {
 
-            if (pipePairs.length) {
-                updatePipePairs();
-            }
+            setTimeout(function () { //throttle speed of animation
+                animate = window.requestAnimationFrame(self.gameLoop);
 
-            if (pipePairs.length) {
-                if (checkCollision()) {
-                    gameOver();
+                updateBackgroundPosition();
+
+                pipePairSpawnCounter++;
+                if (pipePairSpawnCounter > PIPE_SPAWN_DELAY) {
+                    pipeInitialLeftPosition += PIPE_SPAWN_GAP;
+                    pipePairs.push(createPipes(pipeInitialLeftPosition));
+                    pipePairSpawnCounter = 0;
                 }
-            }
-            updateBird();
+
+                if (pipePairs.length) {
+                    updatePipePairs();
+                }
+
+                if (pipePairs.length) {
+                    if (checkCollision()) {
+                        gameOver();
+                    }
+                }
+
+                updateBird();
+
+            }, 1000 / FPS);
 
 
-        }, GAME_LOOP_INTERVAL)
+        };
+
+
+        animate = window.requestAnimationFrame(self.gameLoop);
 
     };
 
@@ -140,7 +154,6 @@ function Container(props) {
 
         horizontalBackgroundPosition = 0;
         self.score = 0;
-
         self.$elem.remove();
         self.$gameOverWrapper.style.display = "none";
         self.$scoreWrapper.style.display = "none";
@@ -170,7 +183,7 @@ function Container(props) {
 
             if (pipe.x < CONTAINER_LEFT - PIPE_WIDTH) {
                 pipe.destroyPipePair();
-                pipePairs.splice(pipePairs.indexOf(pipe), 1);
+                pipePairs.shift();
             }
 
         }
@@ -236,8 +249,8 @@ function Container(props) {
 
     const gameOver = () => {
         gameStatus = false;
-        clearInterval(self.interval);
-        newBird.$elem.style.background = "url(\"images/bird-dead.png\") repeat-x";
+        window.cancelAnimationFrame(animate);
+        newBird.$elem.style.background = "url(\"images/bird-dead.png\")";
         self.$gameOverWrapper.style.display = "block";
         $finalScore.innerHTML = self.score;
     };
@@ -256,15 +269,7 @@ function Container(props) {
                 newBird.updateBird(-1, BIRD_JUMP_SPEED);
             }
         }
-        // else {
-        //     if (event.keyCode === 27) {
-        //         //ESCAPE
-        //         reset();
-        //     }
-        // }
-
     };
-
 
 
 }
