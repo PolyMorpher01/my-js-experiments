@@ -12,7 +12,7 @@ const BIRD_HEIGHT = 24;
 const BIRD_WIDTH = 34;
 const BIRD_LEFT_POSITION = 150;
 const BIRD_INITIAL_TOP_POSITION = 100;
-const BIRD_JUMP_SPEED = 40;
+const BIRD_JUMP_SPEED = 5;
 const BIRD_FALL_SPEED = 6;
 
 const PIPE_WIDTH = 52;
@@ -76,12 +76,12 @@ class PipePair {
     constructor(x, $parent) {
         this.x = x;
         this.$parent = $parent;
-        this.topY = getRandom(-200, 0);
-        this.bottomY = PIPE_SPACE + this.topY;
     }
 
 
     init() {
+        this.topY = getRandom(-200, 0);
+        this.bottomY = PIPE_SPACE + this.topY;
         this.createPipePair();
     }
 
@@ -123,6 +123,10 @@ class Bird {
     init() {
         this.createBird();
         this.plotPosition();
+
+        this.birdRiseMargin = 0;
+        this.speed = 0;
+        this.angle = 0;
     };
 
     createBird() {
@@ -138,9 +142,57 @@ class Bird {
     }
 
 
-    updateBird(dy = 1, speed) {
-        this.y = this.y + dy * speed;
+    updateBirdPosition() {
+        if (this.birdRiseMargin > 0) {
+
+            this.dy = -1;
+            this.birdRiseMargin--;
+
+            if (this.birdRiseMargin === 0)
+                this.speed = 1;
+            else
+                this.speed = BIRD_JUMP_SPEED;
+
+
+            if (this.angle >= -40)
+                this.angle -= 10;
+
+        }
+
+        else {
+
+            this.dy = 1;
+
+            if (this.speed < BIRD_FALL_SPEED) {
+                this.speed += 2;
+            }
+
+
+            if (this.angle <= 90)
+                this.angle += 5;
+
+            this.$elem.style.background = "url(\"images/bird-down-flap.png\") no-repeat";
+        }
+
+        this.y = this.y + this.dy * this.speed;
         this.plotPosition();
+        this.rotateBird();
+    }
+
+
+    renderBirdJump() {
+        this.$elem.style.background = "url(\"images/bird-up-flap.png\") no-repeat";
+        this.birdRiseMargin = 10;
+    }
+
+
+    rotateBird() {
+        if (this.dy === 1) {
+            this.$elem.style.transform = "rotate(" + this.angle + "deg)";
+        }
+        else {
+            this.$elem.style.transform = "rotate(" + this.angle + ")";
+        }
     }
 
     destroyBird() {
@@ -159,15 +211,16 @@ class Container {
         this.$homeScreen = $homeScreen;
         this.$gameOverWrapper = $gameOverWrapper;
         this.$parent = $parent;
-        this.score = 0;
-        this.pipePairs = [];
-        this.gameStatus = false;
-        this.horizontalBackgroundPosition = 0;
     }
 
     init() {
         this.createContainer();
         document.onkeydown = this.keyDownHandler.bind(this);
+
+        this.score = 0;
+        this.pipePairs = [];
+        this.gameStatus = false;
+        this.horizontalBackgroundPosition = 0;
     };
 
 
@@ -179,6 +232,11 @@ class Container {
 
         this.createBird();
         this.addScoreWrapper();
+
+        this.$elem.onclick = ()=>{
+            this.newBird.renderBirdJump();
+        };
+
 
         const FPS = 30;
 
@@ -206,7 +264,9 @@ class Container {
                     }
                 }
 
+
                 this.updateBird();
+
 
             }, 1000 / FPS);
 
@@ -272,9 +332,7 @@ class Container {
 
 
     updateBird() {
-        this.newBird.updateBird(1, BIRD_FALL_SPEED);
-
-        // this.newBird.$elem.style.transform = "rotate(25deg)";
+        this.newBird.updateBirdPosition();
 
         if (this.newBird.y > CONTAINER_BOTTOM - BIRD_HEIGHT || this.newBird.y < CONTAINER_TOP + BIRD_HEIGHT) {
             this.gameOver();
@@ -310,7 +368,7 @@ class Container {
 
         this.$scoreWrapper.style.display = "block";
         this.scoreBackground = "url(\"images/0.png\") no-repeat";
-        this.$scoreWrapper.style.background =  this.scoreBackground;
+        this.$scoreWrapper.style.background = this.scoreBackground;
     }
 
 
@@ -329,14 +387,14 @@ class Container {
         const SCORE_SPACE = 25;
         let scoreLeft = 0;
         for (let i = digits.length - 1; i >= 0; i--) {
-            this.scoreBackground += "url(\"images/" + digits[i] + ".png\") no-repeat " + scoreLeft+"px"+ " 0";
+            this.scoreBackground += "url(\"images/" + digits[i] + ".png\") no-repeat " + scoreLeft + "px" + " 0";
             if (i !== 0) {
                 scoreLeft += SCORE_SPACE;
                 this.scoreBackground += ",";
             }
         }
 
-        this.$scoreWrapper.style.background =  this.scoreBackground ;
+        this.$scoreWrapper.style.background = this.scoreBackground;
 
     }
 
@@ -346,7 +404,7 @@ class Container {
         window.cancelAnimationFrame(this.animate);
         this.newBird.$elem.style.background = "url(\"images/bird-dead.png\")";
         this.$gameOverWrapper.style.display = "block";
-        $finalScore.style.background =  this.scoreBackground;
+        $finalScore.style.background = this.scoreBackground;
     }
 
 
@@ -359,12 +417,11 @@ class Container {
         if (this.gameStatus === true) {
             if (event.keyCode === 32) {
                 //SPACE_BAR
-                // this.newBird.$elem.style.transform = "rotate(-25deg)";
-                this.newBird.updateBird(-1, BIRD_JUMP_SPEED);
+                this.newBird.renderBirdJump();
             }
+
         }
     }
-
 }
 
 //*************Game Class Definition*******************
