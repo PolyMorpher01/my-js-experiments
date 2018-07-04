@@ -154,9 +154,8 @@ class Bird {
                 this.speed = BIRD_JUMP_SPEED;
 
 
-            if (this.angle >= -40)
-                this.angle -= 10;
-
+            if (this.angle >= -90)
+                this.angle -= 5;
         }
 
         else {
@@ -175,8 +174,8 @@ class Bird {
         }
 
         this.y = this.y + this.dy * this.speed;
-        this.plotPosition();
         this.rotateBird();
+        this.plotPosition();
     }
 
 
@@ -332,6 +331,7 @@ class Container {
 
 
     updateBird() {
+
         this.newBird.updateBirdPosition();
 
         if (this.newBird.y > CONTAINER_BOTTOM - BIRD_HEIGHT || this.newBird.y < CONTAINER_TOP + BIRD_HEIGHT) {
@@ -351,7 +351,7 @@ class Container {
             }
 
             else {
-                let OFFSET = 2;
+                const OFFSET = 2;
                 if (this.newBird.x > this.pipePairs[0].x + PIPE_WIDTH - OFFSET) {
                     this.updateScore();
                 }
