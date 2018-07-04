@@ -171,7 +171,7 @@ class Bird {
             if (this.angle <= 90)
                 this.angle += 5;
 
-            this.$elem.style.background = "url(\"images/bird-down-flap.png\") no-repeat";
+            this.$elem.style.background = "url(\"images/bird-up-flap.png\") no-repeat";
         }
 
         this.y = this.y + this.dy * this.speed;
@@ -181,7 +181,7 @@ class Bird {
 
 
     renderBirdJump() {
-        this.$elem.style.background = "url(\"images/bird-up-flap.png\") no-repeat";
+        this.$elem.style.background = "url(\"images/bird-down-flap.png\") no-repeat";
         this.birdRiseMargin = 10;
     }
 
